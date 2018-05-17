@@ -2,6 +2,8 @@
 
 #include "Common.h"
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 extern bool isSigintReceived;
 extern bool isSigusr1Received;

@@ -9,7 +9,7 @@ void signal_init() {
 
     struct sigaction sig;
     memset (&sig, 0, sizeof(sig));
-    sig.sa_sigaction = &sigintHandler;
+    sig.sa_sigaction = &sigint_handler;
     sig.sa_flags = SA_SIGINFO;
 
     if (sigaction(SIGINT, &sig, NULL) < 0) {
@@ -23,7 +23,7 @@ void signal_init() {
 
     struct sigaction sig;
     memset (&sig, '\0', sizeof(sig));
-    sig.sa_sigaction = &sigusr1Handler;
+    sig.sa_sigaction = &sigusr1_handler;
     sig.sa_flags = SA_SIGINFO | SA_RESTART;
 
     if (sigaction(SIGUSR1, &sig, NULL) < 0) {
@@ -35,8 +35,8 @@ void signal_init() {
   {
     struct sigaction sig;
     memset (&sig, '\0', sizeof(sig));
-    sig.sa_sigaction = &sigchldHandler;
-    sig.sa_flags = SA_SIGINFO;
+    sig.sa_sigaction = &sigchld_handler;
+    sig.sa_flags = SA_SIGINFO | SA_RESTART;
 
     if (sigaction(SIGCHLD, &sig, NULL) < 0) {
       perror("sigaction_SIGCHLD");
@@ -55,6 +55,6 @@ void sigusr1_handler(int sig, siginfo_t *siginfo, void *context) {
 }
 
 void sigchld_handler(int sig, siginfo_t *siginfo, void *context) {
-  fprintf(stderr, "Child Exit\n");
+  //fprintf(stdout, "Child Exit\n");
   while (waitpid(-1, NULL, WNOHANG) > 0) { }
 }
