@@ -1,4 +1,11 @@
-# hackttp
-A basic C++ HTTP server
+# 2018s-gitctf-team1
 
-The purpose of creating this project is to learn about sockets, threads and other required internal parts of the Linux Operating System. No external libs will be used, all is to be done in pure-ish C++.
+## Member
+- AhnMo
+- hansh17
+- hestai63
+- saykim0727
+
+## Description
+This program is based on [hackttp](https://github.com/LeHack/hackttp) <del>(Really??)</del>.
+> TBD
