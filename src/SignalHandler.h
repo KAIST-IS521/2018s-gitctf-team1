@@ -1,19 +1,12 @@
-//
-// Created by atticus on 12/9/15.
-//
-
-#ifndef HACKTTP_SIGNALHANDLER_H
-#define HACKTTP_SIGNALHANDLER_H
+#pragma once
 
 #include "Common.h"
 #include <signal.h>
 
-class SignalHandler{
-    public:
-        SignalHandler();
-        virtual ~SignalHandler();
-        static void sigintHandler(int, siginfo_t *, void *);
-        static void sigusr1Handler(int, siginfo_t *, void *);
-};
+extern bool isSigintReceived;
+extern bool isSigusr1Received;
 
-#endif //HACKTTP_SIGNALHANDLER_H
+void signal_init();
+void sigint_handler (int sig, siginfo_t *siginfo, void *context);
+void sigusr1_handler(int sig, siginfo_t *siginfo, void *context);
+void sigchld_handler(int sig, siginfo_t *siginfo, void *context);

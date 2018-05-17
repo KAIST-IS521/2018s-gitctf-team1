@@ -1,48 +1,60 @@
-//
-// Created by atticus on 12/9/15.
-//
 #include "SignalHandler.h"
 
 bool isSigintReceived;
 bool isSigusr1Received;
 
-SignalHandler::SignalHandler() {
+void signal_init() {
+  {
     isSigintReceived = false;
+
+    struct sigaction sig;
+    memset (&sig, 0, sizeof(sig));
+    sig.sa_sigaction = &sigintHandler;
+    sig.sa_flags = SA_SIGINFO;
+
+    if (sigaction(SIGINT, &sig, NULL) < 0) {
+      perror("sigaction_SIGINT");
+      exit(1);
+    }
+  }
+
+  {
     isSigusr1Received = false;
 
-    struct sigaction sigintStruct;
-    memset (&sigintStruct, '\0', sizeof(sigintStruct));
-    /* Use the sa_sigaction field because the handles has two additional parameters */
-    sigintStruct.sa_sigaction = &sigintHandler;
-    /* The SA_SIGINFO flag tells sigaction() to use the sa_sigaction field, not sa_handler. */
-    sigintStruct.sa_flags = SA_SIGINFO;
+    struct sigaction sig;
+    memset (&sig, '\0', sizeof(sig));
+    sig.sa_sigaction = &sigusr1Handler;
+    sig.sa_flags = SA_SIGINFO | SA_RESTART;
 
-    if (sigaction(SIGINT, &sigintStruct, NULL) < 0) {
-        //logger->warn("Signal error");
+    if (sigaction(SIGUSR1, &sig, NULL) < 0) {
+      perror("sigaction_SIGUSR1");
+      exit(1);
     }
+  }
 
-    struct sigaction sigusr1Struct;
-    memset (&sigusr1Struct, '\0', sizeof(sigusr1Struct));
-    /* Use the sa_sigaction field because the handles has two additional parameters */
-    sigusr1Struct.sa_sigaction = &sigusr1Handler;
-    /* The SA_SIGINFO flag tells sigaction() to use the sa_sigaction field, not sa_handler. */
-    sigusr1Struct.sa_flags = SA_SIGINFO | SA_RESTART;
+  {
+    struct sigaction sig;
+    memset (&sig, '\0', sizeof(sig));
+    sig.sa_sigaction = &sigchldHandler;
+    sig.sa_flags = SA_SIGINFO;
 
-    if (sigaction(SIGUSR1, &sigusr1Struct, NULL) < 0) {
-        //logger->warn("Signal error");
+    if (sigaction(SIGCHLD, &sig, NULL) < 0) {
+      perror("sigaction_SIGCHLD");
+      exit(1);
     }
-    //logger->debug("Ready");
+  }
 }
 
-SignalHandler::~SignalHandler() {
+
+void sigint_handler(int sig, siginfo_t *siginfo, void *context) {
+  isSigintReceived = true;
 }
 
-void SignalHandler::sigintHandler(int sig, siginfo_t *siginfo, void *context){
-    //logger->info("SignalHandler: Signal recieved - SIGINT, Shutting down");
-    isSigintReceived = true;
+void sigusr1_handler(int sig, siginfo_t *siginfo, void *context) {
+  isSigusr1Received = true;
 }
 
-void SignalHandler::sigusr1Handler(int sig, siginfo_t *siginfo, void *context){
-    //logger->info("SignalHandler: Signal recieved - SIGUSR1, Config will be reloaded on next use.");
-    isSigusr1Received = true;
+void sigchld_handler(int sig, siginfo_t *siginfo, void *context) {
+  fprintf(stderr, "Child Exit\n");
+  while (waitpid(-1, NULL, WNOHANG) > 0) { }
 }
