@@ -3,18 +3,22 @@
 
 #include "Exceptions.h"
 #include "Logger.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 
 class Router {
 private:
     int queue_size;
     int listening_socket_fd;
-    std::string port;
-    struct addrinfo *addr;
+    int port;
+    struct sockaddr_in addr;
     Logger *logger;
-    int init_socket();
+    void init_socket();
 
 public:
-    Router(int qsize, std::string port);
+    Router(int qsize, int port);
     virtual ~Router();
     void watch();
 

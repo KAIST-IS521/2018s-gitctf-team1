@@ -12,21 +12,19 @@
  * Handles *some* of the HTTP errors
  */
 
-Router::Router(int qsize, std::string port) {
+Router::Router(int qsize, int port) {
     this->queue_size = qsize;
-    this->logger = new Logger("Router");
     this->port = port;
     // initialize the socket
-    this->listening_socket_fd = this->init_socket();
+    this->init_socket();
 }
 
 Router::~Router() {
     // close our socket
     close(this->listening_socket_fd);
     // free the address
-    freeaddrinfo(addr);
-    this->logger->info("Router instance correctly closed, dropping Logger");
-    delete(this->logger);
+    //freeaddrinfo(addr);
+    //this->logger->info("Router instance correctly closed, dropping Logger");
 }
 
 void *get_in_addr(struct sockaddr *sa) {
@@ -42,7 +40,7 @@ void Router::watch() {
     struct sockaddr_storage client;
     int handling_socket;
 
-    this->logger->debug("watching port: " + this->port);
+    //this->logger->debug("watching port: " + this->port);
 
     // create a manager object to handle different threads
     Manager manager;
@@ -56,7 +54,7 @@ void Router::watch() {
         handling_socket = accept(this->listening_socket_fd, (struct sockaddr *) &client, &addr_size);
         if (handling_socket < 0) {
             if(errno == EINTR){
-                this->logger->info("Accept() interrupted by signal");
+                //this->logger->info("Accept() interrupted by signal");
                 break;
             } else {
                 char *err = std::strerror(errno);
@@ -68,43 +66,39 @@ void Router::watch() {
         struct sockaddr_in *sin = (struct sockaddr_in *)&client;
         char client_addr[INET6_ADDRSTRLEN];
         inet_ntop(AF_INET, &sin->sin_addr, client_addr, sizeof client_addr);
-        this->logger->debug("Handling connection from: " + string(client_addr));
+        //this->logger->debug("Handling connection from: " + string(client_addr));
         // this will create a new worker to work with
         // TODO: add try/catch and handle too many workers exception
         manager.handle_request(string(client_addr), handling_socket);
     }
 }
 
-int Router::init_socket() {
-    struct addrinfo listening_socket_description;
+void Router::init_socket() {
+    // XXX: only support ipv4
+    listening_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-    // first, load up address structs with getaddrinfo():
-    // TODO error handling (what if there's no memory available)
-    memset(&listening_socket_description, 0, sizeof listening_socket_description);
-
-    // TODO add option to listen on a particular address
-    listening_socket_description.ai_family = AF_UNSPEC;  // use IPv4 or IPv6, whichever
-    listening_socket_description.ai_socktype = SOCK_STREAM;
-    listening_socket_description.ai_flags = AI_PASSIVE;     // fill in my IP for me
-    getaddrinfo(NULL, this->port.c_str(), &listening_socket_description, &this->addr);
-
-    int listening_socket = socket(this->addr->ai_family, this->addr->ai_socktype, this->addr->ai_protocol);
-    if (listening_socket < 0) {
+    if (listening_socket_fd < 0) {
         char * err = std::strerror(errno);
-        throw Router::Exception("Error opening socket: " + std::string(err ? err : "unknown error"));
+        throw Router::Exception("socket: " + std::string(err ?
+                    err : "unknown error"));
     }
+
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_UNSPEC;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(port);
+
     int optval = 1;
-    if (setsockopt(listening_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0) {
-        char * err = std::strerror(errno);
-        throw Router::Exception("Error setting socket options: " + std::string(err ? err : "unknown error"));
+    if (setsockopt(listening_socket_fd, SOL_SOCKET, SO_REUSEADDR,
+                   &optval, sizeof(int)) < 0) {
+        char *err = std::strerror(errno);
+        throw Router::Exception("setsockopt: " + std::string(err ?
+                    err : "unknown error"));
     }
 
-    int check = bind(listening_socket, this->addr->ai_addr, this->addr->ai_addrlen);
-    if (check < 0) {
-        char * err = std::strerror(errno);
-        throw Router::Exception("Error binding socket: " + std::string(err ? err : "unknown error"));
+    if (bind(listening_socket_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+        char *err = std::strerror(errno);
+        throw Router::Exception("bind: " + std::string(err ?
+                    err : "unknown error"));
     }
-
-    this->logger->debug("Got socket: " + std::to_string(listening_socket));
-    return listening_socket;
 }
