@@ -1,30 +1,37 @@
 #include "BasicHTTP.h"
+#include <algorithm>
 
 /*
  * BasicHTTP - implements a simple way to create serializable HTTP reponses that can be returned by worker
  */
 
 BasicHTTP::BasicHTTP(string client) {
+    this->logger = new Logger("BasicHTTP");
+    this->logger->set_postfix(client);
 }
 
 BasicHTTP::~BasicHTTP() {
+    delete(this->logger);
 }
 
 bool is_valid(BasicHTTP::request req) {
     // if all tests pass, return true
     return (
-        (req.http_version == "HTTP/1.0" || req.http_version == "HTTP/1.1")
-        && (req.method == "GET" || req.method == "POST")
+        (req.http_version == "http/1.0" || req.http_version == "http/1.1")
+        && (req.method == "get" || req.method == "post")
         && req.uri.length() > 0
     );
 }
 
 BasicHTTP::request BasicHTTP::parse_request(std::string req_str) {
-    //this->logger->debug("Full request: " + req_str);
+ //   this->logger->debug("Full request: " + req_str);
     request req;
+    std::transform(req_str.begin(),req_str.end(),req_str.begin(),::tolower);
+    std::cout<<req_str<<std::endl;
     if (req_str.length() < 3) {
         req.valid = false;
         return req;
+
     }
 
     // From http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5
@@ -54,14 +61,15 @@ BasicHTTP::request BasicHTTP::parse_request(std::string req_str) {
     // now end with checking if it's actually valid
     req.valid = is_valid(req);
 
+    //**std::cout<<req.valid<<std::endl;    
     // find and extract cookies, if available
     if (req.valid) {
         req.cookies = BasicHTTP::fetch_cookies(req_str);
 
-        if (req.method == "GET") {
+        if (req.method == "get") {
             handle_get_method(&req);
         }
-        if (req.method == "POST") {
+        if (req.method == "post") {
             handle_post_method(&req, req_str);
         }
     }
@@ -100,13 +108,14 @@ std::string BasicHTTP::fetch_cookies(std::string req_str) {
 
     std::string cookies = "";
     // to extract the POST params we first need to find it and it's length
-    if ((pos = req_str.find("Cookie: ")) != std::string::npos) {
+    if ((pos = req_str.find("cookie: ")) != std::string::npos) {
         if ((eol = req_str.find("\r\n", pos)) != std::string::npos) {
             cookies = req_str.substr(pos + 8, eol - pos - 8);
-            //this->logger->debug("Cookies: " + cookies);
+            //this->logger->debug("cookies: " + cookies);
         }
     }
 
+    std::cout<<cookies<<std::endl;
     return cookies;
 }
 
@@ -133,12 +142,12 @@ void BasicHTTP::handle_post_method(BasicHTTP::request * req, std::string req_str
     size_t pos = 0, prev_pos = 0;
 
     // to extract the POST params we first need to find it and it's length
-    if ((pos = req_str.find("Content-Length:", prev_pos)) != std::string::npos) {
+    if ((pos = req_str.find("content-length:", prev_pos)) != std::string::npos) {
         size_t eol = 0;
         int content_length = 0;
         if ((eol = req_str.find("\r\n", pos)) != std::string::npos) {
             content_length = std::stoi(req_str.substr(pos + 16, eol - pos + 16));
-            //this->logger->debug("Content-Length: " + std::to_string(content_length));
+            this->logger->debug("content-length: " + std::to_string(content_length));
         }
         // don't read anything, if content data was 0, or wasn't defined at all
         if (content_length > 0 && (pos = req_str.find("\r\n\r\n", eol)) != std::string::npos) {
