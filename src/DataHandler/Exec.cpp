@@ -1,6 +1,7 @@
 #include "../DataHandler.h"
 
 #include <unistd.h>
+#include <vector>
 
 #define BUF_BLOCK_SIZE 1024
 #define PIPE_READ 0
@@ -14,11 +15,11 @@ DataHandler::resource DataHandler::Exec::run_command(std::string args[]) {
     return DataHandler::Exec::run_command(args, NULL);
 }
 
-DataHandler::resource DataHandler::Exec::run_command(std::string args[], DataHandler::resource * data) {
+DataHandler::resource DataHandler::Exec::run_command(std::string args[], DataHandler::resource *data) {
     return DataHandler::Exec::run_command(args, NULL, "");
 }
 
-DataHandler::resource DataHandler::Exec::run_command(std::string args[], DataHandler::resource * data, std::string cookies) {
+DataHandler::resource DataHandler::Exec::run_command(std::string args[], DataHandler::resource *data, std::string cookies) {
     int comms_in[2];
     int comms_out[2];
 
@@ -69,24 +70,26 @@ DataHandler::resource DataHandler::Exec::run_command(std::string args[], DataHan
         close(comms_in[PIPE_WRITE]);
         close(comms_out[PIPE_READ]);
 
+        std::vector<std::string> envs;
         // set the request method correctly
         if (data) {
-            std::string req_method = "REQUEST_METHOD=" + data->type;
-            putenv((char *)req_method.c_str());
-            std::string req_size = "CONTENT_LENGTH=" + std::to_string(data->size + 1);
-            putenv((char *)req_size.c_str());
+          envs.push_back("REQUEST_METHOD=" + data->type);
+          envs.push_back("CONTENT_LENGTH=" + std::to_string(data->size + 1));
+
             // don't forget to pass any GET data we might have got for the executed command
             if (data->type == "GET") {
-                std::string req_data = "QUERY_STRING=" + std::string(data->data);
-                putenv((char *)req_data.c_str());
+              envs.push_back("QUERY_STRING=" + std::string(data->data));
             }
         }
 
         if (cookies.length() > 0) {
-            std::string req_cookies = "COOKIE=" + cookies;
-            putenv((char *)req_cookies.c_str());
+          envs.push_back("COOKIE=" + cookies);
         }
-        
+
+        for (auto it = envs.begin(); it != envs.end(); ++it)
+          if (putenv((char *)(*it).c_str()) != 0)
+            throw DataHandler::Exception("Error on putenv");
+
         // now run the target
         // TODO: Fix me! I'm ugly!
         if (execl(args[0].c_str(), args[0].c_str(), args[1].c_str(), (char *) 0) < 0) {
