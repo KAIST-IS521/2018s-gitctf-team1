@@ -27,7 +27,6 @@ BasicHTTP::request BasicHTTP::parse_request(std::string req_str) {
  //   this->logger->debug("Full request: " + req_str);
     request req;
     std::transform(req_str.begin(),req_str.end(),req_str.begin(),::tolower);
-    std::cout<<req_str<<std::endl;
     if (req_str.length() < 3) {
         req.valid = false;
         return req;
@@ -73,7 +72,7 @@ BasicHTTP::request BasicHTTP::parse_request(std::string req_str) {
             handle_post_method(&req, req_str);
         }
     }
-
+    
     return req;
 }
 
@@ -115,7 +114,6 @@ std::string BasicHTTP::fetch_cookies(std::string req_str) {
         }
     }
 
-    std::cout<<cookies<<std::endl;
     return cookies;
 }
 
@@ -140,6 +138,10 @@ void BasicHTTP::handle_get_method(BasicHTTP::request * req) {
 
 void BasicHTTP::handle_post_method(BasicHTTP::request * req, std::string req_str) {
     size_t pos = 0, prev_pos = 0;
+
+    req->data.type = req->method;
+    if ((pos = req->uri.find("?", 0)) != std::string::npos)
+        req->uri  = req->uri.substr(0, pos);
 
     // to extract the POST params we first need to find it and it's length
     if ((pos = req_str.find("content-length:", prev_pos)) != std::string::npos) {
