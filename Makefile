@@ -4,12 +4,12 @@ SRC=src
 CFLAGS=-I$(SRC) -std=c++11 -O3 -Wall -fmessage-length=0
 
 ODIR=Release
-LIBS=-lpthread
+LIBS=
 
 _OBJS = BasicHTTP DataHandler DataHandler/Exec Router SignalHandler Worker
 OBJ = $(patsubst %,$(ODIR)/%.o,$(_OBJS))
 
-hackttp: $(OBJ) $(ODIR)/server.o 
+hackttp: $(OBJ) $(ODIR)/server.o
 	@echo 'Building HackTTP: $@'
 	@$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
