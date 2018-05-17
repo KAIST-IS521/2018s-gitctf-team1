@@ -8,16 +8,16 @@
 
 /*
  * "main" - should use other modules for everything, that is:
- *	- read cmd line options
- *	- read config file
- *	- bind the router tho the receiving port and give it control
- *	- when router finishes, log and shutdown
+ *    - read cmd line options
+ *    - read config file
+ *    - bind the router tho the receiving port and give it control
+ *    - when router finishes, log and shutdown
  */
 
 int main() {
-	// Init basic classes
+    // Init basic classes
     CmdLine cmdline;
-	Config* config = Config::getInstance();
+    Config* config = Config::getInstance();
     Logger logger("Server");
     SignalHandler signalHandler;
 
@@ -38,9 +38,9 @@ int main() {
     } else {
         logger.info("Running in test mode");
     }
-	// cleanup
+    // cleanup
 
-	logger.info("HackTTP shutting down");
+    logger.info("HackTTP shutting down");
 
-	return 0;
+    return 0;
 }

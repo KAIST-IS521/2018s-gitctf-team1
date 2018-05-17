@@ -11,9 +11,9 @@ private:
     void send_msg(char * msg, long size);
 
 public:
-	Worker(string client, int socket_fd);
-	virtual ~Worker();
-	void handle_request();
+    Worker(string client, int socket_fd);
+    virtual ~Worker();
+    void handle_request();
 
     class Exception: public BaseException {
         public:

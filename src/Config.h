@@ -7,8 +7,8 @@
 #include "Logger.h"
 
 class Config {
-	private:
-		int queue_size;
+    private:
+        int queue_size;
         std::string configString;
         std::string delimiter;
         std::string configRelevantString;
@@ -17,7 +17,7 @@ class Config {
         size_t position;
         void loadConfigFileToMap();
         void reload_on_usr1();
-	    void printMapContents();
+        void printMapContents();
         Config();
         static Config* configSingleton;
         static bool isConfigLoggerCreated;
@@ -26,9 +26,9 @@ class Config {
 
 public:
         static Config* getInstance();
-		virtual ~Config();
-		int get_int_setting(std::string);
-		std::string get_str_setting(std::string);
+        virtual ~Config();
+        int get_int_setting(std::string);
+        std::string get_str_setting(std::string);
 };
 
 class ConfigException: public BaseException {

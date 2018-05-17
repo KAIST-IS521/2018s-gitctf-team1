@@ -20,7 +20,7 @@ Worker::Worker(string client, int socket_fd) {
 
 Worker::~Worker() {
     // make sure to close the socket when we finish
-	close(this->socket_fd);
+    close(this->socket_fd);
     delete(this->logger);
 }
 

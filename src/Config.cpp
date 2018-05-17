@@ -100,15 +100,15 @@ void Config::reload_on_usr1() {
 
 int Config::get_int_setting(std::string setting_name) {
     reload_on_usr1();
-	int returnInt = -1;
+    int returnInt = -1;
     try {
         returnInt = std::stoi(configMap.at(setting_name));
     } catch (out_of_range){
         throw ConfigException("Unknown int option passed: " + setting_name);
-	} catch (invalid_argument){
+    } catch (invalid_argument){
         throw ConfigException("Error parsing config to int, check config file syntax at " + setting_name);
     }
-	return returnInt;
+    return returnInt;
 }
 
 

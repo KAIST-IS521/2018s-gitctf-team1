@@ -3,8 +3,8 @@
 
 class CmdLine {
 public:
-	CmdLine();
-	virtual ~CmdLine();
+    CmdLine();
+    virtual ~CmdLine();
 };
 
 #endif /* SRC_CMDLINE_H_ */

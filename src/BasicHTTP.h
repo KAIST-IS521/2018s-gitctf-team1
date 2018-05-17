@@ -36,9 +36,9 @@ private:
 
 public:
     BasicHTTP(string client);
-	virtual ~BasicHTTP();
-	request  parse_request(string req_str);
-	response render_headers(int code, DataHandler::resource rsrc);
+    virtual ~BasicHTTP();
+    request  parse_request(string req_str);
+    response render_headers(int code, DataHandler::resource rsrc);
 
     class Exception: public BaseException {
         public:

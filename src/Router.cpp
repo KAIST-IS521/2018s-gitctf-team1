@@ -13,11 +13,11 @@
  */
 
 Router::Router(int qsize, std::string port) {
-	this->queue_size = qsize;
-	this->logger = new Logger("Router");
-	this->port = port;
+    this->queue_size = qsize;
+    this->logger = new Logger("Router");
+    this->port = port;
     // initialize the socket
-	this->listening_socket_fd = this->init_socket();
+    this->listening_socket_fd = this->init_socket();
 }
 
 Router::~Router() {
@@ -38,7 +38,7 @@ void *get_in_addr(struct sockaddr *sa) {
 }
 
 void Router::watch() {
-	socklen_t addr_size;
+    socklen_t addr_size;
     struct sockaddr_storage client;
     int handling_socket;
 

@@ -18,11 +18,11 @@ private:
     bool verify_path(std::string path);
 public:
     DataHandler(string client);
-	virtual ~DataHandler();
-	resource read_resource(std::string path);
-	resource read_resource(std::string path, std::string cookies);
-	resource read_resource(std::string path, std::string cookies, DataHandler::resource * data);
-	resource get_error_file(int error_code, std::string param);
+    virtual ~DataHandler();
+    resource read_resource(std::string path);
+    resource read_resource(std::string path, std::string cookies);
+    resource read_resource(std::string path, std::string cookies, DataHandler::resource * data);
+    resource get_error_file(int error_code, std::string param);
 
     // Exception base
     class Exception: public BaseException {
@@ -32,7 +32,7 @@ public:
             }
     };
 
-	class Static {
+    class Static {
         private:
             Logger *logger;
         public:
@@ -40,7 +40,7 @@ public:
             ~Static();
             resource get_file(std::string path);
             resource get_error_file(int error_code, std::string param);
-	};
+    };
 
     class Exec {
         private:

@@ -11,16 +11,16 @@ private:
     int get_free_worker_index();
 
 public:
-	Manager();
-	virtual ~Manager();
-	void handle_request(string client, int socket_fd);
+    Manager();
+    virtual ~Manager();
+    void handle_request(string client, int socket_fd);
 
-	class Exception: public BaseException {
-	    public:
-	        Exception(std::string msg = "Unknown manager exception") {
-	            reason = msg;
-	        }
-	};
+    class Exception: public BaseException {
+        public:
+            Exception(std::string msg = "Unknown manager exception") {
+                reason = msg;
+            }
+    };
 };
 
 #endif /* SRC_MANAGER_H_ */
