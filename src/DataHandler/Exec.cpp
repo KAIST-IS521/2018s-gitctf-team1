@@ -114,7 +114,7 @@ DataHandler::resource DataHandler::Exec::run_command(std::string args[], DataHan
         // Now first write what we have
         if (data && data->type == "POST") {
             if (write(comms_in[PIPE_WRITE], data->data, data->size + 1) == -1 ) {
-                char * err = std::strerror(errno);
+                char *err = std::strerror(errno);
                 throw DataHandler::Exception(
                     "Error while writing to child process: " + std::string(args[0]) +", "
                     + "error message: " + std::string(err ? err : "unknown error")
@@ -144,7 +144,7 @@ DataHandler::resource DataHandler::Exec::run_command(std::string args[], DataHan
 
         // add NULL termination
         output.data[buf_pos] = '\0';
-        output.size = buf_pos + 1;
+        output.size = buf_pos;
 
         close(comms_out[PIPE_READ]);
     }
