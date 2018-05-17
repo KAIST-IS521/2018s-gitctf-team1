@@ -2,7 +2,6 @@
 #define SRC_BASICHTTP_H_
 
 #include "DataHandler.h"
-#include "Logger.h"
 
 // Currently returned HTTP CODES
 #define HTTP_OK                 200
@@ -29,7 +28,6 @@ public:
     };
 
 private:
-    Logger *logger;
     std::string fetch_cookies(string req_str);
     void handle_get_method(request * req);
     void handle_post_method(BasicHTTP::request * req, string req_str);

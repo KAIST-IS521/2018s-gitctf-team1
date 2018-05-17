@@ -1,12 +1,10 @@
 #ifndef SRC_WORKER_H_
 #define SRC_WORKER_H_
 
-#include "Logger.h"
 
 class Worker {
 private:
     int socket_fd;
-    Logger *logger;
     string client;
     void send_msg(char * msg, long size);
 

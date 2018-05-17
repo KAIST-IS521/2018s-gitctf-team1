@@ -12,8 +12,6 @@
  */
 
 Worker::Worker(string client, int socket_fd) {
-    this->logger = new Logger("Worker");
-    this->logger->set_postfix(client);
     this->socket_fd = socket_fd;
     this->client = client;
 }
@@ -21,13 +19,12 @@ Worker::Worker(string client, int socket_fd) {
 Worker::~Worker() {
     // make sure to close the socket when we finish
     close(this->socket_fd);
-    delete(this->logger);
 }
 
 void Worker::handle_request() {
     char *request = (char *)calloc(HTTP_REQUEST_LENGTH, sizeof(char)); // standard limit of 8kb
 
-    this->logger->debug("Handling request via socket: " + std::to_string(this->socket_fd));
+    //this->logger->debug("Handling request via socket: " + std::to_string(this->socket_fd));
 
     int return_code = HTTP_OK;
     BasicHTTP *httpHandler = (BasicHTTP *)   new BasicHTTP(this->client);
@@ -40,7 +37,7 @@ void Worker::handle_request() {
     if(request_size < 0) {
         // TODO not sure if necessary
         if(errno == EINTR){
-            this->logger->info("Recv() interrupted by signal");
+            //this->logger->info("Recv() interrupted by signal");
             free(request);
             delete(httpHandler);
             delete(dHandler);
@@ -52,7 +49,7 @@ void Worker::handle_request() {
     else {
         std::string req_str = std::string(request);
         if (req_str.length() == 0) {
-            this->logger->warn("Empty request received, ignoring");
+            //this->logger->warn("Empty request received, ignoring");
             free(request);
             delete(httpHandler);
             delete(dHandler);
@@ -66,23 +63,23 @@ void Worker::handle_request() {
                 data = dHandler->read_resource(req.uri, req.cookies, &req.data);
             }
             catch (DataHandler::Unsupported &e) {
-                this->logger->debug("Unsupported file while handling request: " + std::string(e.what()));
+                //this->logger->debug("Unsupported file while handling request: " + std::string(e.what()));
                 return_code = HTTP_UNSUP_MEDIA_TYPE;
                 data = dHandler->get_error_file(return_code, std::string(e.what()));
             }
             catch (DataHandler::Exec::PermissionDenied &e) {
-                this->logger->debug("Permission denied while handling request: " + std::string(e.what()));
+                //this->logger->debug("Permission denied while handling request: " + std::string(e.what()));
                 return_code = HTTP_FORBIDDEN;
                 data = dHandler->get_error_file(return_code, std::string(e.what()));
             }
             catch (DataHandler::Exception &e) {
-                this->logger->debug("Got exception while handling request: " + std::string(e.what()));
+                //this->logger->debug("Got exception while handling request: " + std::string(e.what()));
                 return_code = HTTP_NOT_FOUND;
                 data = dHandler->get_error_file(return_code, req.uri.substr(1));
             }
         }
         else {
-            this->logger->debug("Could not parse request: " + req_str);
+            //this->logger->debug("Could not parse request: " + req_str);
             return_code = HTTP_BAD_REQUEST;
             data = dHandler->get_error_file(return_code, req_str);
         }
@@ -94,10 +91,10 @@ void Worker::handle_request() {
     }
 
     if (req.valid) {
-        this->logger->info("\"" + req.method + " " + req.uri + " " + req.http_version + "\" " + to_string(return_code) + " " + to_string(data.size));
+        //this->logger->info("\"" + req.method + " " + req.uri + " " + req.http_version + "\" " + to_string(return_code) + " " + to_string(data.size));
     }
     else {
-        this->logger->info("Could not parse request, " + to_string(return_code));
+        //this->logger->info("Could not parse request, " + to_string(return_code));
     }
 
     BasicHTTP::response resp = httpHandler->render_headers(return_code, data);
@@ -113,7 +110,7 @@ void Worker::handle_request() {
     delete(httpHandler);
     delete(dHandler);
 
-    this->logger->debug("Request handling done");
+    //this->logger->debug("Request handling done");
 
     return;
 }

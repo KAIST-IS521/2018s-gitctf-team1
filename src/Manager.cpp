@@ -1,7 +1,6 @@
 #include "Manager.h"
 #include "Worker.h"
 
-#include <pthread.h>
 /*
  * manager - keeps track of workers, their current status, should handle zombies (number of workers comes from config)
  */
@@ -10,9 +9,7 @@
 pthread_mutex_t * mutex_pool; // separate locks for each thread
 
 Manager::Manager() {
-    Config* config = Config::getInstance();
-    this->logger = new Logger("Manager");
-    this->worker_count = config->get_int_setting("worker_count");
+    this->worker_count = 4;
     this->pool = (pthread_t*)       calloc(worker_count, sizeof(pthread_t));
     mutex_pool = (pthread_mutex_t*) calloc(worker_count, sizeof(pthread_mutex_t));
     for (int i = 0; i < this->worker_count; i++) {
@@ -22,7 +19,6 @@ Manager::Manager() {
 
 Manager::~Manager() {
     free(this->pool);
-    delete(this->logger);
 }
 
 void *worker_runner(void *socket_fd);
@@ -33,7 +29,7 @@ union dCont {
 };
 
 void Manager::handle_request(string client, int socket_fd) {
-    this->logger->debug("Creating new thread for request at socket: " + std::to_string(socket_fd));
+    //this->logger->debug("Creating new thread for request at socket: " + std::to_string(socket_fd));
 
     // get worker, if available
     int worker_ind = this->get_free_worker_index();
@@ -44,7 +40,7 @@ void Manager::handle_request(string client, int socket_fd) {
     params[1].ival   = socket_fd;
     params[2].strval = client.c_str();
     if (pthread_create(&this->pool[worker_ind], NULL, worker_runner, (void *)params) < 0) {
-        char * err = std::strerror(errno);
+        char * err = strerror(errno);
         throw Manager::Exception("Error creating thread: " + std::string(err ? err : "unknown error"));
     }
 
@@ -64,7 +60,7 @@ int Manager::get_free_worker_index() {
     if (free_worker < 0)
         throw Manager::Exception("Max workers exceeded, no free worker available");
 
-    this->logger->debug("Using worker: " + std::to_string(free_worker));
+    //this->logger->debug("Using worker: " + std::to_string(free_worker));
     return free_worker;
 }
 
@@ -82,9 +78,6 @@ void *worker_runner(void *arg) {
     }
     catch (Worker::Exception &e) {
         // create a temporary logger instance
-        Logger *logger = new Logger("Manager");
-        logger->debug( std::string(e.what()) );
-        delete(logger);
     }
 
     // now we have to notify the manager, that we finished by unlocking our mutex

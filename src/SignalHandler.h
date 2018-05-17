@@ -5,12 +5,10 @@
 #ifndef HACKTTP_SIGNALHANDLER_H
 #define HACKTTP_SIGNALHANDLER_H
 
-#include "Logger.h"
+#include "Common.h"
 #include <signal.h>
 
 class SignalHandler{
-    private:
-        static Logger *logger;
     public:
         SignalHandler();
         virtual ~SignalHandler();

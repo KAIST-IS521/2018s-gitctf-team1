@@ -4,21 +4,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-/*
- * handlers - currently two are planned: static file handler, cgi script handler
- * 1. cgi handler - fires given script and returns it's output
- * 2. static resource handler - should be used by static file handler for caching
- *         already retrieved files (up to some configured limit, then gracefully rotate the cache)
- *         this memory should be shared between all workers/static handlers
- */
-
 DataHandler::DataHandler(string client) {
-    this->logger = new Logger("DataHandler");
-    this->logger->set_postfix(client);
 }
 
 DataHandler::~DataHandler() {
-    delete(this->logger);
 }
 
 bool DataHandler::verify_path(std::string path) {
@@ -54,7 +43,6 @@ DataHandler::resource DataHandler::read_resource(std::string path, std::string c
 
     std::string cwd = get_working_path();
     path = cwd + path;
-    this->logger->debug("Checking resource at: " + path);
 
     // first check if such a file even exists
     int fd = open(path.c_str(), O_RDONLY);
@@ -83,21 +71,7 @@ DataHandler::resource DataHandler::read_resource(std::string path, std::string c
         output.size = script_output.size;
         output.type = "executable";
     }
-    // TODO: Move this definition to some more reasonable place
-    else if (is(mime, "HTML"))                       { output.type = "text/html; charset=UTF-8";  }
-    else if (is(mime, "ASCII") && ext == "CSS")      { output.type = "text/css";                  }
-    else if (is(mime, "ERROR") || is(mime, "ASCII")) { output.type = "text/plain; charset=UTF-8"; }
-    else if (is(mime, "JPEG"))                       { output.type = "image/jpeg";                }
-    else if (is(mime, "PNG"))                        { output.type = "image/png";                 }
-    else if (is(mime, "MS Windows icon"))            { output.type = "image/vnd.microsoft.icon";  }
-
-    if (output.type.length() > 0 && output.type != "executable") {
-        DataHandler::Static getter;
-        DataHandler::resource f = getter.get_file(path);
-        output.data = f.data;
-        output.size = f.size;
-    }
-    else if (output.type.length() == 0){
+    if (output.type.length() == 0){
         std::string error_str = "Unsupported mime type: " + std::string(mime);
         // drop 'local' part of path
         size_t pos = 0;

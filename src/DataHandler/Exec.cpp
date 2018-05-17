@@ -11,11 +11,9 @@
  */
 
 DataHandler::Exec::Exec() {
-    this->logger = new Logger("DataHandler::Exec");
 }
 
 DataHandler::Exec::~Exec() {
-    delete(this->logger);
 }
 
 DataHandler::resource DataHandler::Exec::run_command(std::string args[]) {

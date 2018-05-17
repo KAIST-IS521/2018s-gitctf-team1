@@ -1,13 +1,20 @@
 #ifndef SRC_MANAGER_H_
 #define SRC_MANAGER_H_
 
-#include "Logger.h"
+#include "Exceptions.h"
+#include <pthread.h>
+#include <string>
+#include <iostream>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
+
+using namespace std;
 
 class Manager {
 private:
     int worker_count;
     pthread_t * pool; // keeps a pool of available workers
-    Logger *logger;
     int get_free_worker_index();
 
 public:
@@ -17,7 +24,7 @@ public:
 
     class Exception: public BaseException {
         public:
-            Exception(std::string msg = "Unknown manager exception") {
+            Exception(string msg = "Unknown manager exception") {
                 reason = msg;
             }
     };

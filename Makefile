@@ -6,7 +6,7 @@ CFLAGS=-I$(SRC) -std=c++11 -O3 -Wall -fmessage-length=0
 ODIR=Release
 LIBS=-lpthread
 
-_OBJS = BasicHTTP Config DataHandler DataHandler/Exec DataHandler/Static Logger LoggingSingleton Manager Router SignalHandler Worker
+_OBJS = BasicHTTP DataHandler DataHandler/Exec Manager Router SignalHandler Worker
 OBJ = $(patsubst %,$(ODIR)/%.o,$(_OBJS))
 
 hackttp: $(OBJ) $(ODIR)/server.o 

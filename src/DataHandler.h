@@ -2,18 +2,24 @@
 #define SRC_DATAHANDLER_H_
 
 #include "Exceptions.h"
-#include "Logger.h"
+#include <cstring>
+#include <cerrno>
+#include <string>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+
+using namespace std;
 
 class DataHandler {
 public:
     struct resource {
-        std::string type;
+        string type;
         char * data;
         long size;
     };
 
 private:
-    Logger *logger;
     std::string get_working_path();
     bool verify_path(std::string path);
 public:
@@ -32,19 +38,7 @@ public:
             }
     };
 
-    class Static {
-        private:
-            Logger *logger;
-        public:
-            Static();
-            ~Static();
-            resource get_file(std::string path);
-            resource get_error_file(int error_code, std::string param);
-    };
-
     class Exec {
-        private:
-            Logger *logger;
         public:
             Exec();
             ~Exec();

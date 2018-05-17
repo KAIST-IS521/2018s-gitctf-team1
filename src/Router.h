@@ -2,7 +2,7 @@
 #define SRC_ROUTER_H_
 
 #include "Exceptions.h"
-#include "Logger.h"
+#include "globals.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -14,7 +14,6 @@ private:
     int listening_socket_fd;
     int port;
     struct sockaddr_in addr;
-    Logger *logger;
     void init_socket();
 
 public:

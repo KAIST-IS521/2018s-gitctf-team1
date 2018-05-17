@@ -5,12 +5,9 @@
  */
 
 BasicHTTP::BasicHTTP(string client) {
-    this->logger = new Logger("BasicHTTP");
-    this->logger->set_postfix(client);
 }
 
 BasicHTTP::~BasicHTTP() {
-    delete(this->logger);
 }
 
 bool is_valid(BasicHTTP::request req) {
@@ -23,7 +20,7 @@ bool is_valid(BasicHTTP::request req) {
 }
 
 BasicHTTP::request BasicHTTP::parse_request(std::string req_str) {
-    this->logger->debug("Full request: " + req_str);
+    //this->logger->debug("Full request: " + req_str);
     request req;
     if (req_str.length() < 3) {
         req.valid = false;
@@ -52,7 +49,7 @@ BasicHTTP::request BasicHTTP::parse_request(std::string req_str) {
         req.http_version = req_str.substr(prev_pos, pos-prev_pos);
         prev_pos = pos + 2;
     }
-    this->logger->debug("Method: " + req.method + ", HTTP version string: " + req.http_version + ", URI: " + req.uri);
+    //this->logger->debug("Method: " + req.method + ", HTTP version string: " + req.http_version + ", URI: " + req.uri);
 
     // now end with checking if it's actually valid
     req.valid = is_valid(req);
@@ -106,7 +103,7 @@ std::string BasicHTTP::fetch_cookies(std::string req_str) {
     if ((pos = req_str.find("Cookie: ")) != std::string::npos) {
         if ((eol = req_str.find("\r\n", pos)) != std::string::npos) {
             cookies = req_str.substr(pos + 8, eol - pos - 8);
-            this->logger->debug("Cookies: " + cookies);
+            //this->logger->debug("Cookies: " + cookies);
         }
     }
 
@@ -141,7 +138,7 @@ void BasicHTTP::handle_post_method(BasicHTTP::request * req, std::string req_str
         int content_length = 0;
         if ((eol = req_str.find("\r\n", pos)) != std::string::npos) {
             content_length = std::stoi(req_str.substr(pos + 16, eol - pos + 16));
-            this->logger->debug("Content-Length: " + std::to_string(content_length));
+            //this->logger->debug("Content-Length: " + std::to_string(content_length));
         }
         // don't read anything, if content data was 0, or wasn't defined at all
         if (content_length > 0 && (pos = req_str.find("\r\n\r\n", eol)) != std::string::npos) {
