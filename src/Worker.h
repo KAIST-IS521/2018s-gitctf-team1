@@ -5,11 +5,9 @@
 class Worker {
 private:
     int socket_fd;
-    string client;
     void send_msg(char * msg, long size);
-
 public:
-    Worker(string client, int socket_fd);
+    Worker(int fd) : socket_fd(fd) { };
     virtual ~Worker();
     void handle_request();
 
