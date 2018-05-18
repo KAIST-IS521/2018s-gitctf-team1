@@ -1,5 +1,6 @@
 #include "Request.h"
 #include <algorithm>
+#include <curl/curl.h>
 using namespace std;
 request::request(string req_str) {
 	std::transform(req_str.begin(), req_str.end(),
@@ -72,7 +73,8 @@ void request::fetch_cookies(string req_str) {
 					vpos = l_cookies.find("\r\n",kpos);
 					value = l_cookies.substr(kpos+1,vpos-kpos);
 				}
-
+				key=urlencode(key);
+				value=urlencode(value);
 				cookies.insert(make_pair(key,value));
 			}
 		}
@@ -102,6 +104,8 @@ void request::fetch_queries(string req_str) {
 			vpos = temp.find("\r\n",kpos);
 			value = temp.substr(kpos+1,vpos-kpos);
 		}
+		key=urlencode(key);
+		value=urlencode(value);
 		args.insert(make_pair(key,value));
 	}
 }
@@ -135,9 +139,29 @@ void request::fetch_forms(string req_str) {
 				vpos = temp.find("\r\n",kpos);
 				value = temp.substr(kpos+1,vpos-kpos);
 			}
+			key=urlencode(key);
+			value=urlencode(value);
 			forms.insert(make_pair(key,value));
 		}
 
 	}
 }
+string request::urlencode(string data)
+{
+	CURL *curl = curl_easy_init();
+	std::string result="";
 
+	result = curl_easy_escape(curl,(char*)data.c_str(),data.length());
+
+	return result;
+}
+
+string request::urldecode(string data)
+{
+	CURL *curl = curl_easy_init();
+	std::string result="";
+
+	result = curl_easy_unescape(curl,(char*)data.c_str(),data.length());
+
+	return result;
+}

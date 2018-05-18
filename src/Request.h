@@ -18,6 +18,8 @@ class request {
         void fetch_cookies(string req_str);
         void fetch_queries(string req_str);
         void fetch_forms(string req_str);
+	string urlencode(string data);
+	string urldecode(string data);
 };
 #endif
 
