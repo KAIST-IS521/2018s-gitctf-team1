@@ -6,6 +6,11 @@
 #include <iostream>
 #include <typeinfo>
 
+#include <unistd.h>
+#include <cerrno>
+#include <iostream>
+#include <cstring>
+
 // Possibly we could also add a stack trace here:
 // http://stackoverflow.com/questions/353180/how-do-i-find-the-name-of-the-calling-function
 class BaseException: public std::exception {
@@ -24,5 +29,9 @@ class BaseException: public std::exception {
         }
         virtual ~BaseException() throw() {};
 };
+
+#define UNIX_ERROR(m) \
+    (m + std::string(std::strerror(errno) ? \
+                     std::strerror(errno) : "Unknown error" ))
 
 #endif /* SRC_EXCEPTIONS_H_ */
