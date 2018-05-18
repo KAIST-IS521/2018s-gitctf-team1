@@ -1,7 +1,7 @@
 #include "Response.h"
 using namespace std;
 response::response(int code, DataHandler::resource rsrc) {
-
+    response resp;
     // by default no headers are created
     resp.has_headers = false;
     if (rsrc.type != "executable") {
