@@ -42,7 +42,7 @@ Request::Request(std::string req_str) {
 }
 
 std::string Request::getHeader(std::string key){
-	return header.find(strtolower(key)) == header.end() ? "": header[key];
+	return header.find(strtolower(key)) == header.end() ? "": urlencode(header[key]);
 }
 
 std::string Request::getParameters(std::map<std::string, std::string> target){
@@ -52,7 +52,7 @@ std::string Request::getParameters(std::map<std::string, std::string> target){
 	for(iter = target.begin(); iter != target.end(); iter++)
 		result += iter->first + "=" + iter->second + "&";
 	
-	return result.substr(0, result.length()-1);
+	return result = urlencode(result.substr(0, result.length()-1));
 }
 
 std::string Request::getQueryString(){
