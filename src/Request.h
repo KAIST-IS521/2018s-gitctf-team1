@@ -1,24 +1,27 @@
-#ifndef SRC_REQUEST_H_
-#define SRC_REQUEST_H_
+#pragma once
+
+#include <string>
 #include <map>
 
-class request {
-    public:
-        bool valid;
-        string method;
-        string uri;
-        string http_version;
+class Request {
+private:
+  bool valid;
+  std::string method;
+  std::string uri;
+  std::string http_version;
 
-        std::map<string, string> args; // GET_PARAMETERS
-        std::map<string, string> forms; // POST_PARAMETERS
-        std::map<string, string> cookies; // COOKIES
+  std::map<std::string, std::string> header;
+  std::map<std::string, std::string> get; // GET_PARAMETERS
+  std::map<std::string, std::string> post; // POST_PARAMETERS
+  std::map<std::string, std::string> cookie; // COOKIES
 
-    private:
-        void fetch_headers(string req_str);
-        void fetch_cookies(string req_str);
-        void fetch_queries(string req_str);
-        void fetch_forms(string req_str);
-	string urldecode(string data);
+  void fetch_headers(std::string req_str);
+  void fetch_cookies(std::string req_str);
+  void fetch_queries(std::string req_str);
+  void fetch_forms(std::string req_str);
+  std::string urldecode(std::string data);
+
+public:
+  Request(std::string req_str);
+  virtual ~Request();
 };
-#endif
-

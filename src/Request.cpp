@@ -1,57 +1,73 @@
 #include "Request.h"
 #include <algorithm>
 #include <curl/curl.h>
-using namespace std;
-request::request(string req_str) {
-	std::transform(req_str.begin(), req_str.end(),
-			req_str.begin(), std::tolower);
+
+std::string tolower(std::string &str) {
+  std::transform(str.begin(), str.end(), str.begin(), std::tolower);
+  return str;
+}
+
+Request::Request(std::string req_str) {
 	fetch_headers(req_str);
 	if (valid) {
 		fetch_cookies(req_str);
-		fetch_queries(req_str); //get
-		fetch_forms(req_str); //post
+		fetch_queries(req_str);
+    if (method == "POST") {
+		  fetch_forms(req_str);
+    }
 	}
 }
 
-/* From http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5
- * Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
- */
-void request::fetch_headers(string req_str) {
+Request::~Request() { }
+
+void Request::fetch_headers(std::string req_str) {
 	if (req_str.length() < 3) {
 		req.valid = false;
 		return;
 	}
 
-
 	size_t pos = 0, prev_pos = 0;
 
-	// XXX: method
+	// method
 	if ((pos = req_str.find(" ", prev_pos)) != std::string::npos) {
-		method = req_str.substr(prev_pos, pos-prev_pos);
+		method = req_str.substr(prev_pos, pos - prev_pos);
 		prev_pos = pos + 1;
 	}
 
-	// XXX: uri
+	// uri
 	if ((pos = req_str.find(" ", prev_pos)) != std::string::npos) {
-		uri = req_str.substr(prev_pos, pos-prev_pos);
+		uri = req_str.substr(prev_pos, pos - prev_pos);
 		prev_pos = pos + 1;
 	}
 
-	// XXX: version
-	std::string http_ver;
+	// version
 	if ((pos = req_str.find("\r\n", prev_pos)) != std::string::npos) {
-		http_version = req_str.substr(prev_pos, pos-prev_pos);
+		http_version = req_str.substr(prev_pos, pos - prev_pos);
 		prev_pos = pos + 2;
 	}
 
-	// XXX: check validity of request
-	valid = ((http_version == "http/1.0" || req.http_version == "http/1.1") &&
-			(method == "get" || method == "post") &&
-			(uri.length() > 0));
+	// check validity of request
+	valid = (
+    (http_version == "HTTP/1.0" || http_version == "HTTP/1.1") &&
+		(method == "GET" || method == "POST") &&
+		(uri.length() > 0)
+  );
+
+  while ((pos = req_str.find("\r\n", prev_pos)) != std::string::npos) {
+    std::string line = req_str.substr(prev_pos, pos - prev_pos);
+    if (line == "") break;
+
+    size_t temp_pos = 0,
+    if ((temp_pos = line.find(":", 0)) != std::string::npos) {
+
+    }
+
+    prev_pos = pos + 2;
+  }
 }
 
 
-void request::fetch_cookies(string req_str) {
+void Request::fetch_cookies(std::string req_str) {
 	size_t pos = 0, eol = 0, kpos=0, vpos =0;
 
 	std::string l_cookies = "";
@@ -67,51 +83,49 @@ void request::fetch_cookies(string req_str) {
 
 				if((vpos = l_cookies.find(";",kpos))!=std::string::npos){
 					value = l_cookies.substr(kpos+1,vpos-kpos-1);
-					vpos = vpos+2;	
+					vpos = vpos+2;
 				}
 				else{
 					vpos = l_cookies.find("\r\n",kpos);
 					value = l_cookies.substr(kpos+1,vpos-kpos);
 				}
-				key=urldecode(key);
-				value=urldecode(value);
-				cookies.insert(make_pair(key,value));
+				key = urldecode(key);
+				value = urldecode(value);
+				cookies.insert(std::make_pair(key, value));
 			}
 		}
 	}
 }
 
 //get
-void request::fetch_queries(string req_str) {
+void Request::fetch_queries(std::string req_str) {
 	size_t pos = 0, kpos = 0, vpos = 0;
 	std::string params = "";
 
 	if ((pos = uri.find("?", 0)) != std::string::npos) {
 		params = uri.substr(pos+1);
+	} else { //no get method
+		return ; // TODO: create excpetion
 	}
-	else { //no get method
-		return ;
-	}
-	while((kpos = params.find("=",vpos))!=std::string::npos){
-		std::string key="";
-		std::string value="";
-		key = temp.substr(vpos,kpos-vpos);
-		if((vpos = temp.find("&",kpos))!=std::string::npos){
-			value = temp.substr(kpos+1,vpos-kpos-1);
-			vpos = vpos+1;	
+	while ((kpos = params.find("=",vpos)) != std::string::npos){
+		std::string key;
+		std::string value;
+		key = temp.substr(vpos, kpos - vpos);
+		if((vpos = temp.find("&",kpos)) != std::string::npos) {
+			value = temp.substr(kpos + 1, vpos - kpos - 1);
+			vpos = vpos + 1;
+		} else {
+			vpos = temp.find("\r\n", kpos);
+			value = temp.substr(kpos + 1, vpos - kpos);
 		}
-		else{
-			vpos = temp.find("\r\n",kpos);
-			value = temp.substr(kpos+1,vpos-kpos);
-		}
-		key=urldecode(key);
-		value=urldecode(value);
-		args.insert(make_pair(key,value));
+		key = urldecode(key);
+		value = urldecode(value);
+		args.insert(std::make_pair(key, value));
 	}
 }
 
 //post
-void request::fetch_forms(string req_str) {
+void Request::fetch_forms(std::string req_str) {
 	size_t pos = 0, prev_pos = 0, kpos = 0, vpos = 0;
 	std::string data = "";
 
@@ -127,32 +141,28 @@ void request::fetch_forms(string req_str) {
 		else
 			return ;
 
-		while((kpos = params.find("=",vpos))!=std::string::npos){
-			std::string key="";
-			std::string value="";
-			key = temp.substr(vpos,kpos-vpos);
-			if((vpos = temp.find("&",kpos))!=std::string::npos){
-				value = temp.substr(kpos+1,vpos-kpos-1);
-				vpos = vpos+1;	
+		while ((kpos = params.find("=",vpos)) != std::string::npos){
+			std::string key;
+			std::string value;
+			key = temp.substr(vpos, kpos - vpos);
+			if((vpos = temp.find("&", kpos)) != std::string::npos){
+				value = temp.substr(kpos + 1, vpos - kpos - 1);
+				vpos = vpos + 1;
+			} else {
+				vpos = temp.find("\r\n", kpos);
+				value = temp.substr(kpos + 1, vpos - kpos);
 			}
-			else{
-				vpos = temp.find("\r\n",kpos);
-				value = temp.substr(kpos+1,vpos-kpos);
-			}
-			key=urldecode(key);
-			value=urldecode(value);
-			forms.insert(make_pair(key,value));
+			key = urldecode(key);
+			value = urldecode(value);
+			forms.insert(std::make_pair(key, value));
 		}
 
 	}
 }
 
-string request::urldecode(string data)
-{
+std::string Request::urldecode(std::string data) {
 	CURL *curl = curl_easy_init();
-	std::string result="";
-
-	result = curl_easy_unescape(curl,(char*)data.c_str(),data.length());
-
+	std::string result;
+	result = curl_easy_unescape(curl, (char *)data.c_str(), data.length());
 	return result;
 }
