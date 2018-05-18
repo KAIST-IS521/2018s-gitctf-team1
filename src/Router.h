@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Exceptions.h"
-#include "globals.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
