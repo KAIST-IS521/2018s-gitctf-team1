@@ -49,21 +49,35 @@ void request::fetch_headers(string req_str) {
             (uri.length() > 0));
 }
 
-/*
-std::string BasicHTTP::fetch_cookies(std::string req_str) {
-    size_t pos = 0, eol = 0;
+
+void request::fetch_cookies(std::string req_str) {
+    size_t pos = 0, eol = 0, kpos=0, vpos =0;
 
     std::string cookies = "";
     // to extract the POST params we first need to find it and it's length
     if ((pos = req_str.find("cookie: ")) != std::string::npos) {
         if ((eol = req_str.find("\r\n", pos)) != std::string::npos) {
             cookies = req_str.substr(pos + 8, eol - pos - 8);
+            //this->logger->debug("cookies: " + cookies);
+	    while((kpos = cookies.find("=",vpos))!=std::string::npos){
+    	            std::string key="";
+    		    std::string value="";
+		    key = cookies.substr(vpos,kpos-vpos);
+		    if((vpos = cookies.find(";",kpos))!=std::string::npos){
+			value = cookies.substr(kpos+1,vpos-kpos-1);
+			vpos = vpos+2;	
+		    }
+		    else{
+			vpos = cookies.find("\r\n",kpos);
+			value = cookies.substr(kpos+1,vpos-kpos);
+		    }
+		    cookies.insert(make_pair(key,value));
+		    //std::cout<<"key = "<<key<<", value = "<<value<<std::endl;
+	    }
         }
     }
-
-    return cookies;
 }
-
+/*
 void BasicHTTP::handle_get_method(BasicHTTP::request * req) {
     size_t pos = 0;
 
