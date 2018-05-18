@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <string>
 #include <curl/curl.h>
+#include <string.h>
 #include <iostream>
 #include <functional>
 #include <cctype>
@@ -38,6 +39,28 @@ Request::Request(std::string req_str) {
 		  fetch_forms(req_str);
     }
 	}
+}
+
+std::string Request::getHeader(std::string key){
+	return header.find(strtolower(key)) == header.end() ? "": header[key];
+}
+
+std::string Request::getParameters(std::map<std::string, std::string> target){
+	std::map<std::string, std::string>::iterator iter;
+	std::string result;
+
+	for(iter = target.begin(); iter != target.end(); iter++)
+		result += iter->first + "=" + iter->second + "&";
+	
+	return result.substr(0, result.length()-1);
+}
+
+std::string Request::getQueryString(){
+	return getParameters(get);
+}
+
+std::string Request::getPostData(){
+	return getParameters(post);
 }
 
 Request::~Request() { }
@@ -87,8 +110,8 @@ void Request::fetch_headers(std::string req_str) {
       key = line.substr(0, temp_pos);
       value = line.substr(temp_pos + 1, line.length());
       value = trim(value);
-
-      header.insert(std::make_pair(key, value));
+      
+      header.insert(std::make_pair(strtolower(key), value));
     }
 
     prev_pos = pos + 2;
@@ -119,7 +142,7 @@ void Request::fetch_cookies(std::string req_str) {
 				}
 				key = urldecode(key);
 				value = urldecode(value);
-				cookie.insert(std::make_pair(key, value));
+				cookie.insert(std::make_pair(strtolower(key), value));
 			}
 		}
 	}
@@ -149,7 +172,7 @@ void Request::fetch_queries(std::string req_str) {
 		}
 		key = urldecode(key);
 		value = urldecode(value);
-		get.insert(std::make_pair(key, value));
+		get.insert(std::make_pair(strtolower(key), value));
 	}
 }
 
@@ -183,7 +206,7 @@ void Request::fetch_forms(std::string req_str) {
 			}
 			key = urldecode(key);
 			value = urldecode(value);
-			post.insert(std::make_pair(key, value));
+			post.insert(std::make_pair(strtolower(key), value));
 		}
 	}
 }
