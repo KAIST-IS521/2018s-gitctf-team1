@@ -1,7 +1,6 @@
 #include "Response.h"
-
-BasicHTTP::response BasicHTTP::render_headers(int code, DataHandler::resource rsrc) {
-    response resp;
+using namespace std;
+response::response(int code, DataHandler::resource rsrc) {
 
     // by default no headers are created
     resp.has_headers = false;
@@ -23,6 +22,16 @@ BasicHTTP::response BasicHTTP::render_headers(int code, DataHandler::resource rs
         resp.has_headers = true;
     }
     return resp;
+}
+
+string response::urlencode(string data)
+{
+	CURL *curl = curl_easy_init();
+	std::string result="";
+
+	result = curl_easy_escape(curl,(char*)data.c_str(),data.length());
+
+	return result;
 }
 
 

@@ -20,6 +20,8 @@ class response {
         response();
         // rendering response
         string render();
+    private:
+	string urlencode(string data);
 };
 
 #endif
