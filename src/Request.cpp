@@ -42,7 +42,7 @@ Request::Request(std::string req_str) {
 }
 
 std::string Request::getHeader(std::string key){
-	return header.find(strtolower(key)) == header.end() ? "": urlencode(header[key]);
+	return header.find(strtolower(key)) == header.end() ? "": header[key];
 }
 
 std::string Request::getParameters(std::map<std::string, std::string> target){
