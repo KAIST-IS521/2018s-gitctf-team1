@@ -1,7 +1,9 @@
-#ifndef SRC_RESPONSE_H_
-#define SRC_RESPONSE_H_
+#pragma once
+
+#include <string>
 #include <map>
-// HTTP STATUS CODE
+
+// HTTP STATUS CODES
 #define HTTP_OK                 200
 #define HTTP_BAD_REQUEST        400
 #define HTTP_FORBIDDEN          403
@@ -10,18 +12,14 @@
 #define HTTP_INTERNAL_SRV_ERROR 500
 #define HTTP_NOT_IMPLEMENTED    501
 
-class response {
-    public:
-        std::map<string, string> headers;
-        string body;
-        bool has_headers;
-
-        // XXX: change prototype
-        response();
-        // rendering response
-        string render();
-    private:
-	string urlencode(string data);
+class Response {
+public:
+  Response(int code, DataHandler::resource rsrc);
+  std::string render();
+private:
+  int status_code;
+  std::string status;
+  int length;
+  std::map<std::string, std::string> headers;
+  std::string body;
 };
-
-#endif

@@ -1,38 +1,32 @@
 #include "Response.h"
-using namespace std;
-response::response(int code, DataHandler::resource rsrc) {
-	response resp;
-	// by default no headers are created
-	resp.has_headers = false;
-	if (rsrc.type != "executable") {
-		rsrc.type = rsrc.type == "" ? "text/plain" : rsrc.type;
-		resp.headers =
-			"HTTP/1.1 "+std::to_string(code)+" OK\n"
-			"Server: HackTTP\n"
-			"Connection: close\n"
-			"Content-Type: "+rsrc.type+"\n";
-		;
+#include "DataHandler.h"
 
-		if (rsrc.type.find("image/") != std::string::npos) {
-			resp.headers += "Accept-Ranges: bytes\n";
-			resp.headers += "Content-Length: " + std::to_string(rsrc.size) + "\n";
-		}
+Response::Response(int code, DataHandler::Resource rsrc) {
+  status_code = code;
 
-		// now send the headers
-		resp.headers += "\n";
-		resp.has_headers = true;
-	}
-	return resp;
+  switch(status_code) {
+    case HTTP_OK:                 status = "OK"; break;
+    case HTTP_BAD_REQUEST:        status = "Bad Request"; break;
+    case HTTP_FORBIDDEN:          status = "Forbidden"; break;
+    case HTTP_NOT_FOUND:          status = "Not Found"; break;
+    case HTTP_UNSUP_MEDIA_TYPE:   status = "Unsupported Media Type"; break;
+    case HTTP_INTERNAL_SRV_ERROR: status = "Internal Server Error"; break;
+    case HTTP_NOT_IMPLEMENTED:    status = "Not Implemented"; break;
+    default:                      status = "Unknown error";
+  }
+  //length = ;
+  //body
 }
 
-string response::urlencode(string data)
-{
-	CURL *curl = curl_easy_init();
-	std::string result="";
+std::string Response::render() {
+  std::string output;
 
-	result = curl_easy_escape(curl,(char*)data.c_str(),data.length());
+  output += "HTTP/1.1 " + std::to_string(code) + " " + status + "\r\n";
+  for (auto it = headers.begin(); it != headers.end(); ++i) {
+    output += it->first + ": " + it->second + "\r\n";
+  }
+  output += "\r\n";
+  output += body;
 
-	return result;
+  returnd output;
 }
-
-
