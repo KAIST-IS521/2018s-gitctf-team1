@@ -21,6 +21,10 @@ void Router::init_sigchld_handler() {
 Router::Router(int q, int p, int r) : queue_size(q), port(p), root(r) {
     init_socket();
     init_sigchld_handler();
+    char rpath[PATH_MAX];
+
+    root = std::string(realpath(root, rpath));
+    std::cout << "Server resources are located at " << root << endl;
 }
 
 Router::~Router() {
