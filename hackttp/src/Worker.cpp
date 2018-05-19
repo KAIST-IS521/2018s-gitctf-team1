@@ -1,12 +1,4 @@
-#include "Response.h"
-#include "Request.h"
-#include "DataHandler.h"
 #include "Worker.h"
-
-#include <sys/socket.h>
-#include <unistd.h>
-
-#define HTTP_REQUEST_LENGTH 8192
 
 char header_buf[HTTP_REQUEST_LENGTH];
 
@@ -17,7 +9,7 @@ void Worker::handle_request(std::string root) {
     Response resp;
 
     if (header_length > 0) {
-        request req(req_str);
+        Request req(req_str);
 
         if (req.valid) {
             DataHandler dHandler;
