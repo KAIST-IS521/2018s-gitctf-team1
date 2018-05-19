@@ -20,8 +20,6 @@ class Request {
         void fetch_cookies();
         void fetch_queries();
         void fetch_forms();
-        std::string urlencode(std::string data);
-        std::string urldecode(std::string data);
         std::string getParameters(std::map<std::string, std::string> target, char delimiter);
 
     public:
