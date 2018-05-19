@@ -36,11 +36,16 @@ DataHandler::Resource DataHandler::read_Resource(Request req, std::string path) 
         path = "/index.html";
 	}
 
-    std::string cwd = get_working_path();
-    path = cwd + path;
+    //std::string cwd = get_working_path();
+    //path = cwd + path;
+
+    std::string tmp = req.uri;
+    ReplaceAll(tmp, "..", "");
+    tmp = path + tmp;
+    auto pname = tmp.c_str();
 
     // first check if such a file even exists
-    int fd = open(path.c_str(), O_RDONLY);
+    int fd = open(pname, O_RDONLY);
     if (fd < 0) {
         char *err = std::strerror(errno);
         throw DataHandler::FileNotFound("Error while reading file contents at " + path + ": " + std::string(err ? err : "unknown error"));
@@ -49,11 +54,6 @@ DataHandler::Resource DataHandler::read_Resource(Request req, std::string path) 
 
     // check mime type of resource
     //Exec runner;
-
-    std::string tmp = req.uri;
-    ReplaceAll(tmp, "..", "");
-    tmp = path + tmp;
-    auto pname = tmp.c_str();
 
     std::string mime = run_command("", { "/usr/bin/file", pname });
     //char *mime = file_mime.data;
@@ -72,8 +72,8 @@ DataHandler::Resource DataHandler::read_Resource(Request req, std::string path) 
         std::string error_str = "Unsupported mime type: " + std::string(mime);
         // drop 'local' part of path
         size_t pos = 0;
-        while ((pos = error_str.find(cwd)) != std::string::npos)
-            error_str.erase(pos, cwd.length());
+        while ((pos = error_str.find(tmp)) != std::string::npos)
+            error_str.erase(pos, tmp.length());
         throw DataHandler::Unsupported(error_str);
     }
 

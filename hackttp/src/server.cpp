@@ -5,8 +5,8 @@
 
 int main(int argc, char *argv[]) {
   int port = 8000;
-  if (argc < 3) return 0;
-  if (argc == 3) port = atoi(argv[2]);
+  if (argc < 2) return 0;
+  else if (argc > 2) port = atoi(argv[2]);
 
   std::cout << "Listening " << port << std::endl;
   try {
