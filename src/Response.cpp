@@ -1,6 +1,8 @@
 #include "Response.h"
 #include "DataHandler.h"
 
+#include <iostream>
+
 Response::Response(int code, DataHandler::Resource rsrc) {
   status_code = code;
 
@@ -14,19 +16,29 @@ Response::Response(int code, DataHandler::Resource rsrc) {
     case HTTP_NOT_IMPLEMENTED:    status = "Not Implemented"; break;
     default:                      status = "Unknown error";
   }
-  //length = ;
-  //body
+  
+  std::string &data = rsrc.data;
+  if (data.compare(0, 6, "HTTP/1") == 0) {
+    
+  } else { // maybe no header
+    length = data.size();
+    headers.insert(std::make_pair("Server", "IS521-2018s-GITCTF-TEAM1"));
+    headers.insert(std::make_pair("Content-Type", rsrc.type == ""? "text/plain": rsrc.type));
+    headers.insert(std::make_pair("Content-Length", std::to_string(data.size())));
+    headers.insert(std::make_pair("Connection", "Close"));
+    body = data;
+  }
 }
 
 std::string Response::render() {
   std::string output;
 
-  output += "HTTP/1.1 " + std::to_string(code) + " " + status + "\r\n";
-  for (auto it = headers.begin(); it != headers.end(); ++i) {
+  output += "HTTP/1.1 " + std::to_string(status_code) + " " + status + "\r\n";
+  for (auto it = headers.begin(); it != headers.end(); ++it) {
     output += it->first + ": " + it->second + "\r\n";
   }
   output += "\r\n";
   output += body;
 
-  returnd output;
+  return output;
 }

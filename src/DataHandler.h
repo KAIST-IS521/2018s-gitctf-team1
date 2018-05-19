@@ -1,6 +1,6 @@
-#ifndef SRC_DATAHANDLER_H_
-#define SRC_DATAHANDLER_H_
-
+#pragma once
+#include "Request.h"
+#include "Response.h"
 #include "Exceptions.h"
 #include <cstring>
 #include <cerrno>
@@ -9,63 +9,57 @@
 #include <cstdio>
 #include <cstdlib>
 
-using namespace std;
-
 class DataHandler {
-	private:
-    	std::string get_working_path();
-    	bool verify_path(std::string path);
+private:
+  std::string get_working_path();
+  bool verify_path(std::string path);
 
-	public:
-		struct resource {
-			string type;
-			char *data;
-			long size;
-		}
+public:
+  struct Resource {
+    std::string type;
+    std::string data;
+  };
 
-    	DataHandler(std::string client);
-    	virtual ~DataHandler();
-    	resource read_resource(std::string path);
-    	resource read_resource(std::string path, std::string cookies);
-    	resource read_resource(std::string path, std::string cookies, DataHandler::resource *data);
-    	resource get_error_file(int error_code, std::string param);
+  DataHandler(std::string client);
+  virtual ~DataHandler();
+  Resource read_Resource(std::string path);
+  Resource read_Resource(Request  req);  
 
-    	// Exception base
-    	class Exception: public BaseException {
-        	public:
-            	Exception(std::string msg = "Unknown data handler exception") {
-                this->reason = msg;
-            }
-    	};
+  // Exception base
+  class Exception: public BaseException {
+  public:
+    Exception(std::string msg = "Unknown data handler exception") {
+      this->reason = msg;
+    }
+  };
 
-  		class Exec {
-        	public:
-            	Exec();
-            	~Exec();
-            	resource run_command(std::string args[]);
-            	resource run_command(std::string args[], DataHandler::resource *data);
-				resource run_command(std::string args[], DataHandler::resource *data, std::string cookies);
+  class Exec {
+  public:
+    Exec();
+    ~Exec();
+    Resource run_command(std::string args[]);
+    Resource run_command(std::string args[], Request req);
+		//Resource run_command(std::string args[]);
 
-        		class PermissionDenied: public Exception {
-            		public:
-                		PermissionDenied(std::string msg = "Permission denied while trying to execute command") {
-                    	this->reason = msg;
-                		}
-        		};
-    	};
+    class PermissionDenied: public Exception {
+    public:
+      PermissionDenied(std::string msg = "Permission denied while trying to execute command") {
+        this->reason = msg;
+      }
+    };
+  };
 
-    	class FileNotFound: public Exception {
-        	public:
-            	FileNotFound(std::string msg = "Could not find requested file") {
-                this->reason = msg;
-       }
-    	};
-    	class Unsupported: public Exception {
-        	public:
-            	Unsupported(std::string msg = "Unsupported file found") {
-                	this->reason = msg;
-            	}
-    	};
+  class FileNotFound: public Exception {
+  public:
+    FileNotFound(std::string msg = "Could not find requested file") {
+      this->reason = msg;
+    }
+  };
+  class Unsupported: public Exception {
+  public:
+    Unsupported(std::string msg = "Unsupported file found") {
+      this->reason = msg;
+    }
+  };
 };
 
-#endif /* SRC_DATAHANDLER_H_ */

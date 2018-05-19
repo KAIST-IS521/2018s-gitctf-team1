@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DataHandler.h"
 #include <string>
 #include <map>
 
@@ -14,7 +15,7 @@
 
 class Response {
 public:
-  Response(int code, DataHandler::resource rsrc);
+  Response(int code, DataHandler::Resource rsrc);
   std::string render();
 private:
   int status_code;
