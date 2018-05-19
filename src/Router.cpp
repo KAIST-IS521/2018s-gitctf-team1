@@ -45,18 +45,25 @@ void Router::watch() {
         if (pid < 0) {
             throw Router::Exception(UNIX_ERROR("fork: "));
         } else if (!pid) { // child
-            close(fd); // don't need server fd
+            // don't need server fd
+            close(fd);
 
+            // prevent conflict on exec
+            signal(SIGCHLD, SIG_DFL);
+
+            // get client ip, port and print
             struct sockaddr_in *sin = (struct sockaddr_in *)&client;
             char client_addr[INET6_ADDRSTRLEN];
             inet_ntop(AF_INET, &sin->sin_addr, client_addr, sizeof client_addr);
             std::cout << "New connection: " <<
                 client_addr << ":" << sin->sin_port << std::endl;
 
-            Worker w(client_fd); // call worker
+            // call worker
+            Worker w(client_fd);
             w.handle_request();
         } else {
-            close(client_fd); // parent don't need clind fd anymore
+            // parent don't need clind fd anymore
+            close(client_fd);
         }
     }
 }
