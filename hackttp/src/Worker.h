@@ -9,7 +9,7 @@ class Worker {
     public:
         Worker(int fd) : socket_fd(fd) { };
         ~Worker() { };
-        void handle_request();
+        void handle_request(std::string root);
 
         class Exception: public BaseException {
             public:

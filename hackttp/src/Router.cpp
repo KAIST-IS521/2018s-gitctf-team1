@@ -18,9 +18,13 @@ void Router::init_sigchld_handler() {
     signal(SIGCHLD, handler);
 }
 
-Router::Router(int q, int p) : queue_size(q), port(p) {
+Router::Router(int q, int p, int r) : queue_size(q), port(p), root(r) {
     init_socket();
     init_sigchld_handler();
+    char rpath[PATH_MAX];
+
+    root = std::string(realpath(root, rpath));
+    std::cout << "Server resources are located at " << root << endl;
 }
 
 Router::~Router() {
@@ -35,7 +39,7 @@ void Router::watch() {
 
         client_fd = accept(fd, (struct sockaddr *) &client, &addr_size);
         if (client_fd < 0) {
-            if(errno == EINTR) break;
+            if (errno == EINTR) break;
             else {
                 throw Router::Exception(UNIX_ERROR("accept: "));
             }
@@ -60,7 +64,7 @@ void Router::watch() {
 
             // call worker
             Worker w(client_fd);
-            w.handle_request();
+            w.handle_request(r);
         } else {
             // parent don't need clind fd anymore
             close(client_fd);
