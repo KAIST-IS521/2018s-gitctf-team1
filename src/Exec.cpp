@@ -1,13 +1,36 @@
-#include "../DataHandler.h"
-#include "../Request.h"
+#include "Exec.h"
 
-#include <unistd.h>
-#include <vector>
+std::string run_command(std::string path, Request req) {
+  std::vector<std::string> args;
+  args.push_back(req.uri);
 
-#define PIPE_READ 0
-#define PIPE_WRITE 1
+  std::vector<std::string> envs;
+  envs.push_back("REQUEST_METHOD=" + req.method);
+  envs.push_back("CONTENT_LENGTH=" + std::to_string(req.getPostData().size()));
+  auto qstr = req.getQueryString();
+  if (qstr.length() > 0) {
+      envs.push_back("QUERY_STRING=" + qstr);
+  }
 
-std::string run_command(Request req) {
+  auto cookie = req.getCookie();
+  if (cookie.length() > 0) {
+      envs.push_back("COOKIE=" + cookie);
+  }
+
+  return run_command(path, args, envs, req.getPostData());
+}
+
+std::string run_command(std::string path, std::vector<std::string> args) {
+  std::vector<std::string> envs;
+  return run_command(path, args, envs, "");
+}
+
+std::string run_command(
+  std::string path,
+  std::vector<std::string> args,
+  std::vector<std::string> envs,
+  std::string data
+) {
     int comms_in[2];
     int comms_out[2];
 
@@ -36,28 +59,23 @@ std::string run_command(Request req) {
         close(comms_in[PIPE_WRITE]);
         close(comms_out[PIPE_READ]);
 
-        std::vector<std::string> envs;
-        // set the request method correctly
-        envs.push_back("REQUEST_METHOD=" + req.method);
-        envs.push_back("CONTENT_LENGTH=" + std::to_string(req.raw_data.size()));
-        auto qstr = req.getQueryString();
-        if (qstr.length() > 0) {
-            envs.push_back("QUERY_STRING=" + qstr);
-        }
-        auto cookie = req.getCookie();
-        if (cookie.length() > 0) {
-            envs.push_back("COOKIE=" + cookies);
-        }
-
         for (auto it = envs.begin(); it != envs.end(); ++it) {
           if (putenv((char *)(*it).c_str()) != 0)
             throw DataHandler::Exception("Error on putenv");
         }
 
-        auto pname = req.uri.c_str();
-
-        // now run the target
-        if (execl(pname, pname, NULL) < 0) {
+        std::string tmp = args[0];
+        ReplaceAll(tmp, "..", "");
+        tmp = path + tmp;
+        auto pname = tmp.c_str();
+        int ret;
+        if (args.size() == 2) {
+          auto arg = args[1].c_str();
+          ret = execl(pname, pname, arg, NULL);
+        } else {
+          ret = execl(pname, pname, NULL);
+        }
+        if (ret < 0) {
             exit(-1);
         }
     }
@@ -66,24 +84,22 @@ std::string run_command(Request req) {
         close(comms_out[PIPE_WRITE]);
 
         // Now first write what we have
-        auto data = req.getPostData();
         if (data.length() > 0) {
             write(comms_in[PIPE_WRITE], data.c_str(), data.length());
         }
         close(comms_in[PIPE_WRITE]);
 
         int status;
+        char rchar;
+        while (read(comms_out[PIPE_READ], &rchar, 1) == 1) {
+            out += rchar;
+        }
+        close(comms_out[PIPE_READ]);
+
         if (waitpid(pid, &status, WNOHANG) < 0) {
             throw DataHandler::Exception(UNIX_ERROR("waitpid"));
         }
-
-        if (WIFEEXITED(status) && !WEXITSTATUS(status)) {
-            char rchar;
-            while (read(comms_out[PIPE_READ], &rchar, 1) == 1) {
-                out += std::string(rchar);
-            }
-        }
-        close(comms_out[PIPE_READ]);
+        if (WIFEXITED(status) && !WEXITSTATUS(status)) { }
     }
     else { // fork failed
         close(comms_in[PIPE_READ]);
