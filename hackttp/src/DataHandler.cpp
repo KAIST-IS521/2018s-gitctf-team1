@@ -25,20 +25,12 @@ bool DataHandler::verify_path(std::string path) {
     return path_ok;
 }
 
-bool is(char *mime, std::string type) {
-    return (strstr(mime, type.c_str()) != NULL);
-}
-
 DataHandler::Resource DataHandler::read_Resource(Request req, std::string path) {
-    // prepend cwd() to path
-
-    if (!verify_path(path)){
-        path = "/index.html";
+ 
+	if(!verify_path(path)){
+		path = "/index.html";
 	}
-
-    //std::string cwd = get_working_path();
-    //path = cwd + path;
-
+	
     std::string tmp = req.uri;
     ReplaceAll(tmp, "..", "");
     tmp = path + tmp;
@@ -52,57 +44,14 @@ DataHandler::Resource DataHandler::read_Resource(Request req, std::string path) 
     }
     close(fd);
 
-    // check mime type of resource
-    //Exec runner;
-
-    std::string mime = run_command("", { "/usr/bin/file", pname });
-    //char *mime = file_mime.data;
-    //std::string ext = path.substr(path.length() - 3);
-    //for(char c : ext)
-    //    c = std::toupper(c); 
+    // std::string mime = run_command("", { "/usr/bin/file", pname });
 
     DataHandler::Resource output;
-	//if(is(mime, "executable")){
-        std::string script_output = run_command(path, req);
-        output.data = script_output;
-        output.type = "executable";
-    // }
-
-    if (output.type.length() == 0){
-        std::string error_str = "Unsupported mime type: " + std::string(mime);
-        // drop 'local' part of path
-        size_t pos = 0;
-        while ((pos = error_str.find(tmp)) != std::string::npos)
-            error_str.erase(pos, tmp.length());
-        throw DataHandler::Unsupported(error_str);
-    }
+    std::string script_output = run_command(path, req);
+    output.data = script_output;
+    output.type = "executable";
 
 	//Response resp;
 	//resp = Response::Response(HTTP_OK, output);
     return output;
 }
-
-//#define PATH_MAX 1000
-std::string DataHandler::get_working_path() {
-   //int PATH_MAX = 1000;
-   char temp[PATH_MAX]; 
-   return ( getcwd(temp, PATH_MAX) ? std::string(temp) : std::string("") );
-} 
-/*
-DataHandler::resource DataHandler::get_error_file(int error_code, std::string param) {
-    // start by reading the error template
-    DataHandler::resource output = DataHandler::read_resource("/errors/"+ std::to_string(error_code) +".html");
-    // now prepare a place to write the filled template
-    long new_size = output.size + param.length() - 3;
-    char *data = (char *) malloc((new_size+1) * sizeof(char));
-    // and fill it
-    sprintf(data, output.data, param.c_str());
-
-    // free old structure
-    free(output.data);
-    // replace with new pointer
-    output.data = data;
-    output.size = new_size;
-
-    return output;
-} */

@@ -14,7 +14,6 @@
 
 class DataHandler {
 private:
-  std::string get_working_path();
   bool verify_path(std::string path);
 
 public:
@@ -25,7 +24,6 @@ public:
 
   DataHandler();
   virtual ~DataHandler();
-  // Resource read_Resource(std::string path);
   Resource read_Resource(Request req, std::string path);  
 
   // Exception base
