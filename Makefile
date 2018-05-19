@@ -6,17 +6,12 @@ CFLAGS=-I$(SRC) -std=c++11 -O3 -Wall -fmessage-length=0
 ODIR=Release
 LIBS=
 
-_OBJS = Request Response DataHandler DataHandler/Exec Router Worker
+_OBJS = Request Response DataHandler Exec Router Worker
 OBJ = $(patsubst %,$(ODIR)/%.o,$(_OBJS))
 
 hackttp: $(OBJ) $(ODIR)/server.o
 	@echo 'Building HackTTP: $@'
 	@$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-
-$(ODIR)/DataHandler/%.o: $(SRC)/DataHandler/%.cpp $(SRC)/DataHandler.h $(ODIR)/.empty
-	@echo 'Building object: $@'
-	@$(CC) -c -o $@ $< $(CFLAGS)
 
 $(ODIR)/%.o: $(SRC)/%.cpp $(SRC)/%.h $(ODIR)/.empty
 	@echo 'Building object: $@'

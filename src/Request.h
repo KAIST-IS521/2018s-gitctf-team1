@@ -6,8 +6,6 @@
 class Request {
     private:
         bool valid;
-        std::string method;
-        std::string uri;
         std::string http_version;
         std::string raw_data;
 
@@ -24,6 +22,8 @@ class Request {
 
     public:
         Request(std::string req_str);
+        std::string uri;
+        std::string method;
         std::string getHeader(std::string key);
         std::string getQueryString();
         std::string getPostData();
