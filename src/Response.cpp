@@ -4,6 +4,10 @@
 
 #include <iostream>
 
+static Response Response::fromCode(int code) {
+    return response(code, "");
+}
+
 Response::Response(int code, DataHandler::Resource rsrc) {
     status_code = code;
 

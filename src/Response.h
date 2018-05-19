@@ -14,13 +14,14 @@
 #define HTTP_NOT_IMPLEMENTED    501
 
 class Response {
-public:
-  Response(int code, DataHandler::Resource rsrc);
-  std::string render();
-private:
-  int status_code;
-  std::string status;
-  int length;
-  std::map<std::string, std::string> headers;
-  std::string body;
+    public:
+        Response(int code, DataHandler::Resource rsrc);
+        std::string render();
+        static Response fromCode(int code);
+    private:
+        int status_code;
+        std::string status;
+        int length;
+        std::map<std::string, std::string> headers;
+        std::string body;
 };
