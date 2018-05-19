@@ -6,13 +6,14 @@
 
 #include <sys/socket.h>
 #include <unistd.h>
+#include <string>
 
 #define HTTP_REQUEST_LENGTH 8192
 
 class Worker {
 private:
   int socket_fd;
-  void send_msg(char * msg, long size);
+  void send_msg(std::string msg);
 public:
   Worker(int fd) : socket_fd(fd) { };
   ~Worker() { };

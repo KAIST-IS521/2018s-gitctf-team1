@@ -1,6 +1,7 @@
 #pragma once
+
 #include "Request.h"
-#include "Response.h"
+//#include "Response.h"
 #include "Exceptions.h"
 #include <cstring>
 #include <cerrno>
@@ -8,6 +9,8 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+
+//class Response;
 
 class DataHandler {
 private:
@@ -20,10 +23,10 @@ public:
     std::string data;
   };
 
-  DataHandler(std::string client);
+  DataHandler();
   virtual ~DataHandler();
   // Resource read_Resource(std::string path);
-  Response read_Resource(Request req, std::string path);  
+  Resource read_Resource(Request req, std::string path);  
 
   // Exception base
   class Exception: public BaseException {

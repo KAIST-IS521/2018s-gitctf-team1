@@ -13,11 +13,14 @@
 #define HTTP_INTERNAL_SRV_ERROR 500
 #define HTTP_NOT_IMPLEMENTED    501
 
+//class DataHandler;
+
 class Response {
     public:
         Response(int code, DataHandler::Resource rsrc);
+        Response();
         std::string render();
-        static Response fromCode(int code);
+        static Response *fromCode(int code);
     private:
         int status_code;
         std::string status;

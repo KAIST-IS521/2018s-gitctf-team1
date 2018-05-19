@@ -5,7 +5,7 @@
 
 class Request {
     private:
-        bool valid;
+       // bool valid;
         std::string http_version;
         std::string raw_data;
 
@@ -21,6 +21,8 @@ class Request {
         std::string getParameters(std::map<std::string, std::string> target, char delimiter);
 
     public:
+      bool valid;
+
         Request(std::string req_str);
         std::string uri;
         std::string method;

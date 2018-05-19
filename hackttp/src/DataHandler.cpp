@@ -6,7 +6,7 @@
 
 using namespace std;
 
-DataHandler::DataHandler(std::string client) {}
+DataHandler::DataHandler() { }
 
 DataHandler::~DataHandler() {}
 
@@ -29,7 +29,7 @@ bool is(char *mime, std::string type) {
     return (strstr(mime, type.c_str()) != NULL);
 }
 
-Response DataHandler::read_Resource(Request req, std::string path) {
+DataHandler::Resource DataHandler::read_Resource(Request req, std::string path) {
     // prepend cwd() to path
 
     if (!verify_path(path)){
@@ -48,17 +48,22 @@ Response DataHandler::read_Resource(Request req, std::string path) {
     close(fd);
 
     // check mime type of resource
-    Exec runner;
-    /* std::string args[2] = { "/usr/bin/file", path };
-    DataHandler::resource file_mime = runner.run_command(args);
-    char *mime = file_mime.data;
-    std::string ext = path.substr(path.length()-3);
-    for(char c : ext)
-        c = std::toupper(c); */ 
+    //Exec runner;
+
+    std::string tmp = req.uri;
+    ReplaceAll(tmp, "..", "");
+    tmp = path + tmp;
+    auto pname = tmp.c_str();
+
+    std::string mime = run_command("", { "/usr/bin/file", pname });
+    //char *mime = file_mime.data;
+    //std::string ext = path.substr(path.length() - 3);
+    //for(char c : ext)
+    //    c = std::toupper(c); 
 
     DataHandler::Resource output;
 	//if(is(mime, "executable")){
-        std::string script_output = runner.run_command(path, req);
+        std::string script_output = run_command(path, req);
         output.data = script_output;
         output.type = "executable";
     // }
@@ -72,14 +77,14 @@ Response DataHandler::read_Resource(Request req, std::string path) {
         throw DataHandler::Unsupported(error_str);
     }
 
-	Response resp;
-	resp = Response::Response(HTTP_OK, output);
-    return resp;
+	//Response resp;
+	//resp = Response::Response(HTTP_OK, output);
+    return output;
 }
 
-
+//#define PATH_MAX 1000
 std::string DataHandler::get_working_path() {
-   int PATH_MAX = 1000;
+   //int PATH_MAX = 1000;
    char temp[PATH_MAX]; 
    return ( getcwd(temp, PATH_MAX) ? std::string(temp) : std::string("") );
 } 

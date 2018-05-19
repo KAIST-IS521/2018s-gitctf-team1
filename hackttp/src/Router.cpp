@@ -18,13 +18,13 @@ void Router::init_sigchld_handler() {
     signal(SIGCHLD, handler);
 }
 
-Router::Router(int q, int p, int r) : queue_size(q), port(p), root(r) {
+Router::Router(int q, int p, std::string r) : queue_size(q), port(p), root(r) {
     init_socket();
     init_sigchld_handler();
     char rpath[PATH_MAX];
 
-    root = std::string(realpath(root, rpath));
-    std::cout << "Server resources are located at " << root << endl;
+    root = std::string(realpath(root.c_str(), rpath));
+    std::cout << "Server resources are located at " << root << std::endl;
 }
 
 Router::~Router() {
@@ -64,7 +64,7 @@ void Router::watch() {
 
             // call worker
             Worker w(client_fd);
-            w.handle_request(r);
+            w.handle_request(root);
         } else {
             // parent don't need clind fd anymore
             close(client_fd);

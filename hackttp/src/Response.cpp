@@ -4,8 +4,13 @@
 
 #include <iostream>
 
-static Response Response::fromCode(int code) {
-    return response(code, "");
+Response *Response::fromCode(int code) {
+  DataHandler::Resource s;
+  return new Response(code, s);
+}
+
+Response::Response() {
+
 }
 
 Response::Response(int code, DataHandler::Resource rsrc) {
