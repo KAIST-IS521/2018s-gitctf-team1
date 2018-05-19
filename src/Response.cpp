@@ -1,5 +1,6 @@
 #include "Response.h"
 #include "DataHandler.h"
+#include "Util.h"
 
 #include <iostream>
 
@@ -19,7 +20,60 @@ Response::Response(int code, DataHandler::Resource rsrc) {
   
   std::string &data = rsrc.data;
   if (data.compare(0, 6, "HTTP/1") == 0) {
-    
+    size_t pos = 0, prev_pos = 0;
+    std::string tmp;
+
+    if ((pos = data.find(" ", prev_pos)) != std::string::npos) {
+      tmp = data.substr(prev_pos, pos - prev_pos);
+      prev_pos = pos + 1;
+    }
+    if (tmp != "HTTP/1.1" && tmp != "HTTP/1.0") {
+      // throw HTTP_INTERNAL_SRV_ERROR
+    }
+
+    if ((pos = data.find(" ", prev_pos)) != std::string::npos) {
+      tmp = data.substr(prev_pos, pos - prev_pos);
+      prev_pos = pos + 1;
+    }
+    if (std::stoi(tmp) != status_code) {
+      // throw HTTP_INTERNAL_SRV_ERROR
+    }
+
+    // status message -- skip?
+    if ((pos = data.find("\r\n", prev_pos)) != std::string::npos) {
+      prev_pos = pos + 2;
+    }
+
+    while ((pos = data.find("\r\n", prev_pos)) != std::string::npos) {
+    std::string line = data.substr(prev_pos, pos - prev_pos);
+      if (line == "") break;
+
+      size_t temp_pos = 0;
+      if ((temp_pos = line.find(":", 0)) != std::string::npos) {
+        std::string key;
+        std::string value;
+
+        key = line.substr(0, temp_pos);
+        value = line.substr(temp_pos + 1, line.length());
+        value = trim(value);
+
+        headers.insert(std::make_pair(strtolower(key), value));
+      }
+
+      prev_pos = pos + 2;
+    }
+
+    body = data.substr(prev_pos + 2, data.size());
+
+    if (headers.find("content-length") == headers.end())
+      headers.insert(std::make_pair("content-length", std::to_string(data.size())));
+    else {
+      int content_length = std::stoi(headers["content-length"]);
+      if (body.size() != content_length) {
+        // throw HTTP_INTERNAL_SRV_ERROR
+      }
+    }
+
   } else { // maybe no header
     length = data.size();
     headers.insert(std::make_pair("Server", "IS521-2018s-GITCTF-TEAM1"));
