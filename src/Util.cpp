@@ -21,3 +21,46 @@ std::string &strtolower(std::string &str) {
   std::transform(str.begin(), str.end(), str.begin(), ::tolower);
   return str;
 }
+
+std::string urlencode(std::string str) {
+    int len;
+    std::string ret;
+    char tmp[4] = {0, };
+
+    len = str.size();
+    for (int i = 0; i < len; ++i) {
+        if (IS_ALNUM(str[i]))
+            ret += str[i];
+        else {
+            snprintf(tmp, 4, "%%%02X", (unsigned char)(str[i] & 0xFF));
+            ret += tmp;
+        }
+    }
+
+    return ret;
+}
+
+std::string urldecode(std::string str) {
+    int len;
+    std::string ret;
+    char hex[3] = {0, };
+
+    len = str.length();
+    for (int i = 0; i < len; ++i) {
+        if (str[i] != '%') {
+            ret += str[i];
+        } else {
+            if (IS_HEX(str[i + 1]) && IS_HEX(str[i + 2]) && i < (len - 2)) {
+                hex[0] = str[i + 1];
+                hex[1] = str[i + 2];
+                ret += ::strtol( hex, NULL, 16 );
+                i += 2;
+            } else {
+                // invalid encoding
+                ret.clear();
+                break;
+            }
+        }
+    }
+    return ret;
+}

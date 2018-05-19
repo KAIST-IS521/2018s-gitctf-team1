@@ -5,64 +5,6 @@
 #include <string.h>
 #include <iostream>
 
-
-// https://www.joinc.co.kr/w/Site/Code/C/urlencode
-// https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
-#define IS_ALNUM(ch) ( \
-        ( ch >= 'a' && ch <= 'z' ) || \
-        ( ch >= 'A' && ch <= 'Z' ) || \
-        ( ch >= '0' && ch <= '9' ) || \
-        ( ch == '!' ) || ( ch == '.' ) || ( ch == '~' ) || ( ch == '*' ) || \
-        ( ch == '-' ) || ( ch == '_' ) || ( ch == '\'' ) || ( ch == '(' ) || \
-        ( ch == ')' ) )
-#define IS_HEX(ch) ( \
-        ( ch >= '0' && ch <= '9' ) || \
-        ( ch >= 'A' && ch <= 'F' ) || \
-        ( ch >= 'a' && ch <= 'f' ))
-
-std::string urlencode(std::string str) {
-    int len;
-    std::string ret;
-    char tmp[4] = {0, };
-
-    len = str.size();
-    for (int i = 0; i < len; ++i) {
-        if (IS_ALNUM(str[i]))
-            ret += str[i];
-        else {
-            snprintf(tmp, 4, "%%%02X", (unsigned char)(str[i] & 0xFF));
-            ret += tmp;
-        }
-    }
-
-    return ret;
-}
-
-std::string urldecode(std::string str) {
-    int len;
-    std::string ret;
-    char hex[3] = {0, };
-
-    len = str.length();
-    for (int i = 0; i < len; ++i) {
-        if (str[i] != '%') {
-            ret += str[i];
-        } else {
-            if (IS_HEX(str[i + 1]) && IS_HEX(str[i + 2]) && i < (len - 2)) {
-                hex[0] = str[i + 1];
-                hex[1] = str[i + 2];
-                ret += ::strtol( hex, NULL, 16 );
-                i += 2;
-            } else {
-                // invalid encoding
-                ret.clear();
-                break;
-            }
-        }
-    }
-    return ret;
-}
-
 Request::Request(std::string req_str) {
     fetch_headers(req_str);
     if (valid) {
@@ -195,6 +137,7 @@ void Request::fetch_queries() {
 
     if ((pos = uri.find("?", 0)) != std::string::npos) {
         params = uri.substr(pos + 1);
+        uri = uri.substr(0, pos);
 
         while ((kpos = params.find("=", vpos)) != std::string::npos) {
             std::string key;
