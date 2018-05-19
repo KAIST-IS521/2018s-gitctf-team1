@@ -1,5 +1,5 @@
 #include "DataHandler.h"
-
+#include "Exec.h"
 #include <linux/limits.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -15,7 +15,7 @@ bool DataHandler::verify_path(std::string path) {
 
     // verify that the path is not all slashes
     // there's a very nice uncaught exception when we pass '//+' to open()
-    for(char c : path) {      // is it really works?
+    for(char c : path) {
         if (c != '/') {  
             path_ok = true;
             break;
@@ -29,13 +29,7 @@ bool is(char *mime, std::string type) {
     return (strstr(mime, type.c_str()) != NULL);
 }
 
-DataHandler::resource DataHandler::read_resource(std::string path) {
-    return DataHandler::read_resource(path, "");
-}
-DataHandler::resource DataHandler::read_resource(std::string path, std::string cookies) {
-    return DataHandler::read_resource(path, cookies, NULL);
-}
-DataHandler::resource DataHandler::read_resource(std::string path, std::string cookies, DataHandler::resource *data) {
+Response DataHandler::read_Resource(Request req, std::string path) {
     // prepend cwd() to path
 
     if (!verify_path(path)){
@@ -54,42 +48,42 @@ DataHandler::resource DataHandler::read_resource(std::string path, std::string c
     close(fd);
 
     // check mime type of resource
-    DataHandler::Exec runner;
-    std::string args[2] = { "/usr/bin/file", path };
+    Exec runner;
+    /* std::string args[2] = { "/usr/bin/file", path };
     DataHandler::resource file_mime = runner.run_command(args);
     char *mime = file_mime.data;
-    /* std::string ext = path.substr(path.length()-3);
+    std::string ext = path.substr(path.length()-3);
     for(char c : ext)
         c = std::toupper(c); */ 
 
-    DataHandler::resource output;
-    // now check for known mime types
-    if (is(mime, "executable")) {
-        // run the script, pass the data
-        std::string args[2] = { path, "" }; // TODO: Fix me too!
-        DataHandler::resource script_output = runner.run_command(args, data, cookies);
-        output.data = script_output.data;
-        output.size = script_output.size;
+    DataHandler::Resource output;
+	//if(is(mime, "executable")){
+        std::string script_output = runner.run_command(path, req);
+        output.data = script_output;
         output.type = "executable";
-    }
+    // }
+
     if (output.type.length() == 0){
         std::string error_str = "Unsupported mime type: " + std::string(mime);
         // drop 'local' part of path
         size_t pos = 0;
         while ((pos = error_str.find(cwd)) != std::string::npos)
             error_str.erase(pos, cwd.length());
-		// TODO: fix it!
         throw DataHandler::Unsupported(error_str);
     }
 
-    return output;
+	Response resp;
+	resp = Response::Response(HTTP_OK, output);
+    return resp;
 }
+
 
 std::string DataHandler::get_working_path() {
-   char temp[PATH_MAX]; // TODO: define PATH_MAX
+   int PATH_MAX = 1000;
+   char temp[PATH_MAX]; 
    return ( getcwd(temp, PATH_MAX) ? std::string(temp) : std::string("") );
-}
-
+} 
+/*
 DataHandler::resource DataHandler::get_error_file(int error_code, std::string param) {
     // start by reading the error template
     DataHandler::resource output = DataHandler::read_resource("/errors/"+ std::to_string(error_code) +".html");
@@ -106,4 +100,4 @@ DataHandler::resource DataHandler::get_error_file(int error_code, std::string pa
     output.size = new_size;
 
     return output;
-}
+} */

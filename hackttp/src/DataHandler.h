@@ -22,8 +22,8 @@ public:
 
   DataHandler(std::string client);
   virtual ~DataHandler();
-  Resource read_Resource(std::string path);
-  Resource read_Resource(Request  req);  
+  // Resource read_Resource(std::string path);
+  Response read_Resource(Request req, std::string path);  
 
   // Exception base
   class Exception: public BaseException {
@@ -31,22 +31,6 @@ public:
     Exception(std::string msg = "Unknown data handler exception") {
       this->reason = msg;
     }
-  };
-
-  class Exec {
-  public:
-    Exec();
-    ~Exec();
-    Resource run_command(std::string args[]);
-    Resource run_command(std::string args[], Request req);
-		//Resource run_command(std::string args[]);
-
-    class PermissionDenied: public Exception {
-    public:
-      PermissionDenied(std::string msg = "Permission denied while trying to execute command") {
-        this->reason = msg;
-      }
-    };
   };
 
   class FileNotFound: public Exception {
