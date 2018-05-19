@@ -13,9 +13,10 @@ class Router {
         struct sockaddr_in addr;
         void init_socket();
         void init_sigchld_handler();
+        std::root;
 
     public:
-        Router(int qsize, int port);
+        Router(int qsize, int port, std::string r);
         virtual ~Router();
         void watch();
 

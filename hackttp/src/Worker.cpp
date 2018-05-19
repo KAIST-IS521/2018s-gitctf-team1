@@ -10,7 +10,7 @@
 
 char header_buf[HTTP_REQUEST_LENGTH];
 
-void Worker::handle_request() {
+void Worker::handle_request(std::string root) {
     ssize_t header_length = recv(socket_fd, header_buf,
                                  HTTP_REQUEST_LENGTH, 0);
     std::string req_str(header_buf, header_length);
@@ -22,7 +22,7 @@ void Worker::handle_request() {
         if (req.valid) {
             DataHandler dHandler;
             try {
-                resp = dHandler.read_resource(req);
+                resp = dHandler.read_resource(req, root);
             } catch (DataHandler::Unsupported &e) {
                 resp = Response::fromCode(HTTP_UNSUP_MEDIA_TYPE);
             } catch (DataHandler::Exec::PermissionDenied &e) {
