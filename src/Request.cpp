@@ -1,34 +1,9 @@
 #include "Request.h"
-#include <algorithm>
+#include "Util.h"
 #include <string>
 #include <curl/curl.h>
 #include <string.h>
 #include <iostream>
-#include <functional>
-#include <cctype>
-#include <locale>
-
-// https://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
-std::string &ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-            std::not1(std::ptr_fun<int, int>(std::isspace))));
-    return s;
-}
-
-std::string &rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(),
-            std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-    return s;
-}
-
-std::string &trim(std::string &s) {
-    return ltrim(rtrim(s));
-}
-
-std::string &strtolower(std::string &str) {
-  std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-  return str;
-}
 
 Request::Request(std::string req_str) {
 	fetch_headers(req_str);
