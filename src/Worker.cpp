@@ -36,6 +36,7 @@ void Worker::handle_request() {
         std::string resp_str = resp.render();
         send_msg(resp_str.c_str(), resp_str.size());
     }
+    exit(0);
 }
 
 void Worker::send_msg(char * msgc, long size) {
