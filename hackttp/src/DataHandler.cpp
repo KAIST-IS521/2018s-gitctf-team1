@@ -3,6 +3,7 @@
 #include <linux/limits.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "Response.h"
 
 using namespace std;
 
@@ -25,7 +26,7 @@ bool DataHandler::verify_path(std::string path) {
     return path_ok;
 }
 
-DataHandler::Resource DataHandler::read_Resource(Request req, std::string path) {
+Response DataHandler::read_Resource(Request req, std::string path) {
  
 	if(!verify_path(path)){
 		path = "/index.html";
@@ -51,7 +52,7 @@ DataHandler::Resource DataHandler::read_Resource(Request req, std::string path) 
     output.data = script_output;
     output.type = "executable";
 
-	//Response resp;
-	//resp = Response::Response(HTTP_OK, output);
-    return output;
+	Response resp;
+	resp = Response(HTTP_OK, output);
+    return resp;
 }

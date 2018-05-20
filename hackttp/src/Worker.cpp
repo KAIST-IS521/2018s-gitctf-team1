@@ -15,7 +15,7 @@ void Worker::handle_request(std::string root) {
             DataHandler dHandler;
             try {
                 //DataHandler::Resource x = dHandler.read_Resource(req, root);
-                resp = new Response(200, dHandler.read_Resource(req, root));
+                *resp = dHandler.read_Resource(req, root);
             } catch (DataHandler::Unsupported &e) {
                 resp = Response::fromCode(HTTP_UNSUP_MEDIA_TYPE);
             //} catch (DataHandler::Exec::PermissionDenied &e) {
