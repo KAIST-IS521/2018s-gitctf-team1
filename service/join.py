@@ -47,8 +47,15 @@ def handler_post(sess):
   conn = pymysql.connect(host='localhost', user='root', password='root', db='User',charset='utf8')
   try:
     with conn.cursor() as cursor:
-      sql = "INSERT INTO user_tbl (username, password) VALUES (%s, %s);"
-      cursor.execute(sql, (_POST['username'], _POST['password']))
+		sql = "SELECT * FROM user_tbl WHERE username = %s"
+		cursor.execute(sql, (_POST['username'],))
+		result = cursor.fetchone()
+		if(result==None):
+			sql = "INSERT INTO user_tbl (username, password) VALUES (%s, %s);"
+			cursor.execute(sql, (_POST['username'], _POST['password']))
+		else:
+			redirect('/index.py')
+			exit()
     conn.commit()
   finally:
     conn.close()
