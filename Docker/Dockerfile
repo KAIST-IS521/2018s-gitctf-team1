@@ -19,6 +19,7 @@ RUN pip install numpy && \
 RUN rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
+EXEC $PATH/init.py
 
 WORKDIR /root
 CMD ["/bin/bash"]
