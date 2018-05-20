@@ -54,7 +54,7 @@ def handler_post(sess):
 			sql = "INSERT INTO user_tbl (username, password) VALUES (%s, %s);"
 			cursor.execute(sql, (_POST['username'], _POST['password']))
 		else:
-			redirect('/index.py')
+			redirect('/join.py')
 			exit()
     conn.commit()
   finally:
