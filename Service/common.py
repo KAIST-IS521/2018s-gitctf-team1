@@ -214,3 +214,6 @@ class Session:
     if key in self.data:
       del self.data[key]
       self.save_file()
+
+#def shcrypt(plain='', n=123, e=123):
+#  pass
