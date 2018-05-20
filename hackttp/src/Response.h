@@ -6,6 +6,7 @@
 
 // HTTP STATUS CODES
 #define HTTP_OK                 200
+#define HTTP_FOUND              302
 #define HTTP_BAD_REQUEST        400
 #define HTTP_FORBIDDEN          403
 #define HTTP_NOT_FOUND          404
@@ -16,15 +17,15 @@
 //class DataHandler;
 
 class Response {
-    public:
-        Response(int code, DataHandler::Resource rsrc);
-        Response();
-        std::string render();
-        static Response *fromCode(int code);
-    private:
-        int status_code;
-        std::string status;
-        int length;
-        std::map<std::string, std::string> headers;
-        std::string body;
+public:
+  Response(int code, DataHandler::Resource rsrc);
+  Response();
+  std::string render();
+  static Response *fromCode(int code);
+private:
+  int status_code;
+  std::string status;
+  int length;
+  std::map<std::string, std::string> headers;
+  std::string body;
 };
