@@ -215,5 +215,88 @@ class Session:
       del self.data[key]
       self.save_file()
 
+def main_tpl(main, sess=Session()):
+  logined = sess.get('logined') == True
+
+  output  = ''
+  output += '<!DOCTYPE html>'
+  output += '<html lang="en">'
+  output += '<head>'
+  output +=   '<meta charset="utf-8" />'
+  output +=   '<title>Ra.D.io</title>'
+  output +=   '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" />'
+  output +=   '<style>body{padding-top:5rem}.starter-template{padding:3rem 1.5rem;text-align:center}</style>'
+  output += '</head>'
+  output += '<body>'
+  output += '<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">'
+  output +=   '<div class="container">'
+  output +=     '<div class="collapse navbar-collapse" id="navbarsExampleDefault">'
+  output +=       '<ul class="navbar-nav mr-auto">'
+  output +=         '<li class="nav-item"><a class="nav-link" href="index.py">Main</a></li>'
+  if logined:
+    output +=         '<li class="nav-item"><a class="nav-link" href="request.py">Request</a></li>'
+    output +=         '<li class="nav-item"><a class="nav-link" href="view.py">View</a></li>'
+    output +=         '<li class="nav-item"><a class="nav-link" href="logout.py">Logout</a></li>'
+  else:
+    output +=         '<li class="nav-item"><a class="nav-link" href="login.py">Login</a></li>'
+    output +=         '<li class="nav-item"><a class="nav-link" href="join.py">Join</a></li>'
+  output +=       '</ul>'
+  output +=     '</div>'
+  output +=   '</div>'
+  output += '</nav>'
+  output += '<main role="main" class="container">'
+  output +=   '<div class="starter-template">'
+  output +=     '<h1>Ra.D.io</h1>'
+  output +=     '<hr />'
+  output +=     main
+  output +=     '<hr />'
+  output +=     '<p class="mt-5 mb-3 text-muted">&copy; 2018 IS521-GITCTF-TEAM1</p>'
+  output +=   '</div>'
+  output += '</main>'#<!-- /.container -->
+  output += '</body>'
+  output += '</html>'
+
+  headers = {}
+  headers['Content-Type'] = "text/html"
+
+  tmp = sess.get_setcookie()
+  if tmp != None:
+    headers['Set-Cookie'] = tmp
+
+  print_ok(headers=headers, body=output)
+
+def form_tpl(keyword, sess=Session()):
+  output  = ''
+  output += '<!DOCTYPE html>'
+  output += '<html lang="en">'
+  output += '<head>'
+  output += '<meta charset="utf-8" />'
+  output += '<title>%s</title>' % (keyword)
+  output += '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" />'
+  output += '<style>body,html{height:100%}body{display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;padding-top:40px;padding-bottom:40px;background-color:#f5f5f5}.form-signin{width:100%;max-width:330px;padding:15px;margin:auto}.form-signin .checkbox{font-weight:400}.form-signin .form-control{position:relative;box-sizing:border-box;height:auto;padding:10px;font-size:16px}.form-signin .form-control:focus{z-index:2}.form-signin input[type=email]{margin-bottom:-1px;border-bottom-right-radius:0;border-bottom-left-radius:0}.form-signin input[type=password]{margin-bottom:10px;border-top-left-radius:0;border-top-right-radius:0}</style>'
+  output += '</head>'
+  output += '<body class="text-center">'
+  output += '<form class="form-signin" method="post" action="">'
+  output += '<h1 class="h3 mb-3 font-weight-normal">%s</h1>'% (keyword)
+  output += '<label for="inputUsername" class="sr-only">Username</label>'
+  output += '<input type="text" id="inputUsername" name="username" class="form-control" placeholder="Username" required autofocus>'
+  output += '<label for="inputPassword" class="sr-only">Password</label>'
+  output += '<input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>'
+  output += '</div>'
+  output += '<button class="btn btn-lg btn-primary btn-block" type="submit">%s</button>' % (keyword)
+  output += '<p class="mt-5 mb-3 text-muted">&copy; 2018 IS521-GITCTF-TEAM1</p>'
+  output += '</form>'
+  output += '</body>'
+  output += '</html>'
+
+  headers = {}
+  headers['Content-Type'] = "text/html"
+
+  tmp = sess.get_setcookie()
+  if tmp != None:
+    headers['Set-Cookie'] = tmp
+
+  print_ok(headers=headers, body=output)
+
 #def shcrypt(plain='', n=123, e=123):
 #  pass
