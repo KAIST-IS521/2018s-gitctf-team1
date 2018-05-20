@@ -31,9 +31,20 @@ def handler_get():
 
 def handler_post():
   _POST = parse_str(raw_input())
-  headers = {}
-  headers['Content-Type'] = "text/html"
-  print_ok(headers=headers, body=str(_POST))
+  #headers = {}
+  #headers['Content-Type'] = "text/html"
+  #print_ok(headers=headers, body=str(_POST))
+  conn = pymysql.connect(host='localhost', user='root', password='root', db='User',charset='utf8')
+  try:
+	  with conn.cursor() as cursor:
+		  sql = "SELECT * FROM user_tbl WHERE username = %s"
+  		  cursor.execute(sql, (_POST['username'],))
+		  result = cursor.fetchone()
+		  print(result)
+	  conn.commit()
+  finally:
+	  conn.close()
+
 
 if __name__ == '__main__':
   if get_method() == 'GET':
