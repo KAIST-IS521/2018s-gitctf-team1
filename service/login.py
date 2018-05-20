@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from common import *
+import pymysql
 
 def handler_get():
   output  = ''
@@ -31,20 +32,23 @@ def handler_get():
 
 def handler_post():
   _POST = parse_str(raw_input())
-  #headers = {}
-  #headers['Content-Type'] = "text/html"
-  #print_ok(headers=headers, body=str(_POST))
   conn = pymysql.connect(host='localhost', user='root', password='root', db='User',charset='utf8')
   try:
 	  with conn.cursor() as cursor:
-		  sql = "SELECT * FROM user_tbl WHERE username = %s"
-  		  cursor.execute(sql, (_POST['username'],))
-		  result = cursor.fetchone()
-		  print(result)
+		sql = "SELECT * FROM user_tbl WHERE username = %s"
+  		cursor.execute(sql, (_POST['username'],))
+		result = cursor.fetchone()
+		if (result[2]==_POST['password']):
+			sess = Session()
+			sess.set('logined',True)
+			sess.set(_POST['username'],True)
+			redirect("/index.py")
+			exit()
 	  conn.commit()
   finally:
 	  conn.close()
-  redirect('/')
+
+  redirect("/login.py")
 
 if __name__ == '__main__':
   if get_method() == 'GET':
