@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from common import *
+import pymysql
 
 def handler_get():
   output  = ''
@@ -25,6 +26,7 @@ def handler_get():
   output += '</body>'
   output += '</html>'
 
+
   headers = {}
   headers['Content-Type'] = "text/html"
   print_ok(headers=headers, body=output)
@@ -41,7 +43,17 @@ def handler_post():
     return
 
   _POST = parse_str(raw_input())
-  redirect_page('/login.py')
+  conn = pymysql.connect(host='localhost', user='root', password='root', db='User',charset='utf8')
+  try:
+	  with conn.cursor() as cursor:
+		  sql = "INSERT INTO user_tbl (username, password) VALUES (%s, %s)"
+  		  cursor.execute(sql, (_POST['username'],_POST['password']))
+	  conn.commit()
+  finally:
+	  conn.close()
+
+
+  redirect('/login.py')
 
 
 if __name__ == '__main__':
@@ -49,7 +61,7 @@ if __name__ == '__main__':
   try:
     sessid = _COOKIE['TEAM1_SESSID']
     # if already logined, GTFO
-    redirect_page('/index.py')
+    redirect('/index.py')
   except:
     pass
 
