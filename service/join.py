@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from common import *
+import pymysql
 
 def handler_get(sess):
   output  = ''
@@ -25,6 +26,7 @@ def handler_get(sess):
   output += '</body>'
   output += '</html>'
 
+
   headers = {}
   headers['Content-Type'] = "text/html"
 
@@ -37,19 +39,25 @@ def handler_get(sess):
 def handler_post(sess):
   # get username from data to check exist or not
   # if not exist process or Redirect index.py
-  # password rsa encryption
-  # insert user_tbl values(NULL, ?, ?) // with prepare statement
-  # redirect to login.py
-
-  if False:
-    redirect('/index.py')
-    return
 
   _POST = parse_str(raw_input())
+
+  #password = rsaencrpt(password) # TODO: HanSungho
+
+  conn = pymysql.connect(host='localhost', user='root', password='root', db='User',charset='utf8')
+  try:
+    with conn.cursor() as cursor:
+      sql = "INSERT INTO user_tbl (username, password) VALUES (%s, %s);"
+      cursor.execute(sql, (_POST['username'], _POST['password']))
+    conn.commit()
+  finally:
+    conn.close()
+
   redirect('/login.py')
 
 
 if __name__ == '__main__':
+
   sess = Session()
   if sess.get('logined') == True:
     redirect('index.py')
