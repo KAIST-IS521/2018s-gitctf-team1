@@ -47,3 +47,10 @@ CMakeLists.txt
 # Archive
 etap*.zip
 /Release/
+
+# session
+session
+
+*.pyc
+
+Release
