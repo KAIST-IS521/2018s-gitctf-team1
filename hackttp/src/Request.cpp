@@ -144,6 +144,9 @@ void Request::fetch_queries() {
             std::string value;
             key = params.substr(vpos, kpos - vpos);
 	    if ((tpos = key.find("&", 0)) != std::string::npos) {
+		key = key.substr(0,tpos);
+		key = urldecode(key);
+		get.insert(std::make_pair(strtolower(key),""));
 	        vpos = tpos + vpos + 1;
 		continue;
 	    }
