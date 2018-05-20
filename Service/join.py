@@ -16,7 +16,7 @@ def handler_post(sess):
   password = _POST['password']
   #password = rsaencrpt(password) # TODO: HanSungho
 
-  conn = pymysql.connect(host='localhost', user='root', password='wsplab122333', db='RADIO',charset='utf8')
+  conn = pymysql.connect(host='localhost', user='root', password='root', db='RADIO',charset='utf8')
   try:
     with conn.cursor() as cursor:
       # check duplicate username
