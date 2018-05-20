@@ -29,5 +29,5 @@ def init_table(conn):
 
 if __name__ == '__main__':
   conn = pymysql.connect(host='localhost', user='root', password='root', db='User', charset='utf8')
-  #init_db(conn)
+  init_db(conn)
   init_table(conn)
