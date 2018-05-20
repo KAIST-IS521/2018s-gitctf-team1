@@ -1,9 +1,6 @@
-# RSA Encryption
-
-## Import(s) ##
 import sys, random, pickle
 
-## Util(s) ##
+## Utils ##
 def print_usage( command='' ):
 	if command == 'init':
 		print 'init <keys_filename> <prime_length>'
@@ -63,7 +60,7 @@ def inverse_mod( a, m ):
 	else:
 		return None
 
-## Class(es) ##
+## Key generation, Encryption, Decryption ##
 class RSAKey( object ):
 	meta = dict( )
 	primality_confidence = 20
@@ -122,7 +119,7 @@ class RSAKey( object ):
 		ciphertext_handle = open( ciphertext_fn, 'w' )
 		ciphertext_handle.write( ciphertext )
 		ciphertext_handle.close( )
-		print 'Wrote encrypted data to: ' + ciphertext_fn
+		print 'Encrypted data is saved in: ' + ciphertext_fn
 
 	def decrypt( self, keys_fn, ciphertext_fn, decrypted_fn ):
 		self.load( keys_fn )
@@ -135,14 +132,14 @@ class RSAKey( object ):
 		decrypted_handle = open( decrypted_fn, 'w' )
 		decrypted_handle.write( decrypted )
 		decrypted_handle.close( )
-		print 'Wrote decrypted data to: ' + decrypted_fn
+		print 'Decrypted data is saved in: ' + decrypted_fn
 
 	def dump( self, filename ):
 		try:
 			handle = open( filename, 'w' )
 			pickle.dump( self.meta, handle )
 			handle.close( )
-			print 'Wrote generated keys to: ' + str( filename )
+			print 'Generated key is saved in: ' + str( filename )
 		except BaseException as e:
 			print e
 	
