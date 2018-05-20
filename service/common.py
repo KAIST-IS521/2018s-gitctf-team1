@@ -205,6 +205,7 @@ def print_ok(headers={}, body=""):
   sys.stdout.write(headers_str + body)
 
 def redirect(url):
+  headers = {};
   headers['Location'] = url
   headers['Date'] = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %Z")
   headers['Content-Length'] = 0
