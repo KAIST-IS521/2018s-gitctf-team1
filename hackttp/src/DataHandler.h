@@ -23,7 +23,7 @@ public:
 
   DataHandler();
   virtual ~DataHandler();
-  Response read_Resource(Request req, std::string path);  
+  Response *read_Resource(Request req, std::string path);  
 
   // Exception base
   class Exception: public BaseException {
@@ -46,4 +46,3 @@ public:
     }
   };
 };
-

@@ -17,7 +17,7 @@ bool DataHandler::verify_path(std::string path) {
     // verify that the path is not all slashes
     // there's a very nice uncaught exception when we pass '//+' to open()
     for(char c : path) {
-        if (c != '/') {  
+        if (c != '/') {
             path_ok = true;
             break;
         }
@@ -26,12 +26,12 @@ bool DataHandler::verify_path(std::string path) {
     return path_ok;
 }
 
-Response DataHandler::read_Resource(Request req, std::string path) {
- 
+Response *DataHandler::read_Resource(Request req, std::string path) {
+
 	if(!verify_path(path)){
 		path = "/index.html";
 	}
-	
+
     std::string tmp = req.uri;
     ReplaceAll(tmp, "..", "");
     tmp = path + tmp;
@@ -52,7 +52,5 @@ Response DataHandler::read_Resource(Request req, std::string path) {
     output.data = script_output;
     output.type = "executable";
 
-	Response resp;
-	resp = Response(HTTP_OK, output);
-    return resp;
+    return new Response(HTTP_OK, output);
 }
