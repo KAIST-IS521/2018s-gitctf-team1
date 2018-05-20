@@ -155,7 +155,7 @@ def parse_str(query_string, unquote=True):
 
   plist = []
   if query_string == "":
-    return mydict
+    return []
   for element in query_string.split("&"):
     try:
       if unquote:
@@ -175,7 +175,10 @@ def parse_str(query_string, unquote=True):
   return out
 
 def get_environ(key):
-  return os.environ[key]
+  try:
+    return os.environ[key]
+  except:
+    return ""
 
 def get_method():
   return get_environ('REQUEST_METHOD')
