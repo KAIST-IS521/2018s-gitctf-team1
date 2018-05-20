@@ -132,7 +132,7 @@ void Request::fetch_cookies() {
 
 //get
 void Request::fetch_queries() {
-    size_t pos = 0, kpos = 0, vpos = 0;
+    size_t pos = 0, kpos = 0, vpos = 0, tpos = 0;
     std::string params = "";
 
     if ((pos = uri.find("?", 0)) != std::string::npos) {
@@ -143,6 +143,10 @@ void Request::fetch_queries() {
             std::string key;
             std::string value;
             key = params.substr(vpos, kpos - vpos);
+	    if ((tpos = key.find("&", 0)) != std::string::npos) {
+	        vpos = tpos + vpos + 1;
+		continue;
+	    }
             if ((vpos = params.find("&", kpos)) != std::string::npos) {
                 value = params.substr(kpos + 1, vpos - kpos - 1);
                 vpos = vpos + 1;
