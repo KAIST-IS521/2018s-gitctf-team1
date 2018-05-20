@@ -6,6 +6,13 @@ import sys
 import six
 import urllib
 import os
+from string import ascii_letters, digits
+from random import choice
+from os import path
+import pickle
+import re
+
+random_str = lambda l: ''.join([choice(ascii_letters + digits) for n in xrange(l)])
 
 def has_variable_name(s):
   if s.find("[") > 0:
@@ -65,71 +72,7 @@ def parser_helper(key, val):
     pdict[newkey] = val
   return pdict
 
-def parse(query_string, unquote=True, normalized=False, encoding='utf-8'):
-  mydict = {}
-  plist = []
-  if query_string == "":
-    return mydict
-
-  if type(query_string) == bytes:
-    query_string = query_string.decode()
-
-  for element in query_string.split("&"):
-    try:
-      if unquote:
-        (var, val) = element.split("=")
-        if sys.version_info[0] == 2:
-          var = var.encode('ascii')
-          val = val.encode('ascii')
-        var = urllib.unquote_plus(var)
-        val = urllib.unquote_plus(val)
-      else:
-        (var, val) = element.split("=")
-    except ValueError:
-      raise MalformedQueryStringError
-    if encoding:
-      var = var.decode(encoding)
-      val = val.decode(encoding)
-    plist.append(parser_helper(var, val))
-  for di in plist:
-    (k, v) = di.popitem()
-    tempdict = mydict
-    while k in tempdict and type(v) is dict:
-      tempdict = tempdict[k]
-      (k, v) = v.popitem()
-    if k in tempdict and type(tempdict[k]).__name__ == 'list':
-      tempdict[k].append(v)
-    elif k in tempdict:
-      tempdict[k] = [tempdict[k], v]
-    else:
-      tempdict[k] = v
-
-  if normalized == True:
-    return _normalize(mydict)
-  return mydict
-
-
-def _normalize(d):
-  newd = {}
-  if isinstance(d, dict) == False:
-    return d
-  for k, v in six.iteritems(d):
-    if isinstance(v, dict):
-      first_key = next(iter(six.viewkeys(v)))
-      if isinstance(first_key, int):
-        temp_new = []
-        for k1, v1 in v.items():
-          temp_new.append(_normalize(v1))
-        newd[k] = temp_new
-      elif first_key == '':
-        newd[k] = v.values()[0]
-      else:
-        newd[k] = _normalize(v)
-    else:
-      newd[k] = v
-  return newd
-
-def parse_str(query_string, unquote=True):
+def parse_str(query_string, unquote=True, delimiter='&'):
   def recurse( pair, out=None, indent=0 ):
     if isinstance(pair, dict):
       (k, v) = pair.popitem()
@@ -156,7 +99,7 @@ def parse_str(query_string, unquote=True):
   plist = []
   if query_string == "":
     return []
-  for element in query_string.split("&"):
+  for element in query_string.split(delimiter):
     try:
       if unquote:
         (var, val) = element.split("=")
@@ -205,7 +148,7 @@ def print_ok(headers={}, body=""):
   sys.stdout.write(headers_str + body)
 
 def redirect(url):
-  headers = {};
+  headers = {}
   headers['Location'] = url
   headers['Date'] = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %Z")
   headers['Content-Length'] = 0
@@ -216,3 +159,58 @@ def redirect(url):
     headers_str += "%s: %s\r\n" % (i, headers[i])
   headers_str += "\r\n"
   sys.stdout.write(headers_str)
+
+class Session:
+  def __init__(self):
+    self.keyword = 'gitctfsessid'
+    self.session_dir = path.realpath(path.dirname(path.realpath(__file__)) + '/' + 'session')
+    self.identifier = None
+    self.data = {}
+
+    # no such directory
+    if not os.path.isdir(self.session_dir):
+      os.mkdir(self.session_dir)
+
+    # if no headers
+    cookie = parse_str(get_cookie(), delimiter=';')
+    self.new_flag = True
+    if self.keyword in cookie:
+      self.identifier = cookie[self.keyword]
+      if re.match("[0-9A-Za-z]{32}", self.identifier):
+        self.new_flag = False
+
+    if self.new_flag:
+      self.identifier = random_str(32)
+
+    self.path = path.realpath(self.session_dir + '/' + self.identifier)
+
+    if self.new_flag or not path.exists(self.path):
+      self.save_file()
+
+    with open (self.path, 'rb') as fp:
+      self.data = pickle.load(fp)
+
+  def get_setcookie(self):
+    if self.new_flag:
+      return "%s=%s; HttpOnly" % (self.keyword, self.identifier)
+    else:
+      return None
+
+  def save_file(self):
+    with open(self.path, 'wb') as fp:
+      pickle.dump(self.data, fp)
+
+  def get(self, key):
+    if key in self.data:
+      return self.data[key]
+    else:
+      return None
+
+  def set(self, key, val):
+    self.data[key] = val
+    self.save_file()
+
+  def delete(self, key):
+    if key in self.data:
+      del self.data[key]
+      self.save_file()

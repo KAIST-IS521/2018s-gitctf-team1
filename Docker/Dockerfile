@@ -11,16 +11,20 @@ RUN DIST=xenial && \
     alsa-utils
 RUN apt-get install -y apt-utils
 RUN apt-get install -y ca-certificates
+RUN apt-get install -y mysql-server
 RUN apt-get install -y python-pip python-dev build-essential && \
     pip install --upgrade pip
 RUN pip install numpy && \
-    pip install bitarray
+    pip install bitarray && \
+    pip install six && \
+    pip install PyMySQL
 
 RUN rm -rf /var/lib/apt/lists/* && \
     apt-get clean
+
+#etc/init.d/mysql start
 
 EXEC $PATH/init.py
 
 WORKDIR /root
 CMD ["/bin/bash"]
-

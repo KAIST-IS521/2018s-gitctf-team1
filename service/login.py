@@ -44,7 +44,7 @@ def handler_post():
 	  conn.commit()
   finally:
 	  conn.close()
-
+  redirect('/')
 
 if __name__ == '__main__':
   if get_method() == 'GET':

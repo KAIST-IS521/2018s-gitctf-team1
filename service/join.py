@@ -2,7 +2,7 @@
 from common import *
 import pymysql
 
-def handler_get():
+def handler_get(sess):
   output  = ''
   output += '<!DOCTYPE html>'
   output += '<html lang="en">'
@@ -29,43 +29,41 @@ def handler_get():
 
   headers = {}
   headers['Content-Type'] = "text/html"
+
+  tmp = sess.get_setcookie()
+  if tmp != None:
+    headers['Set-Cookie'] = tmp
+
   print_ok(headers=headers, body=output)
 
-def handler_post():
+def handler_post(sess):
   # get username from data to check exist or not
   # if not exist process or Redirect index.py
-  # password rsa encryption
-  # insert user_tbl values(NULL, ?, ?) // with prepare statement
-  # redirect to login.py
-
-  if False:
-    redirect_page('/index.py')
-    return
 
   _POST = parse_str(raw_input())
+
+  #password = rsaencrpt(password) # TODO: HanSungho
+
   conn = pymysql.connect(host='localhost', user='root', password='root', db='User',charset='utf8')
   try:
-	  with conn.cursor() as cursor:
-		  sql = "INSERT INTO user_tbl (username, password) VALUES (%s, %s)"
-  		  cursor.execute(sql, (_POST['username'],_POST['password']))
-	  conn.commit()
+    with conn.cursor() as cursor:
+      sql = "INSERT INTO user_tbl (username, password) VALUES (%s, %s);"
+      cursor.execute(sql, (_POST['username'], _POST['password']))
+    conn.commit()
   finally:
-	  conn.close()
-
+    conn.close()
 
   redirect('/login.py')
 
 
 if __name__ == '__main__':
-  _COOKIE = parse_str(get_cookie())
-  try:
-    sessid = _COOKIE['TEAM1_SESSID']
-    # if already logined, GTFO
-    redirect('/index.py')
-  except:
-    pass
+
+  sess = Session()
+  if sess.get('logined') == True:
+    redirect('index.py')
+    exit()
 
   if get_method() == 'GET':
-    handler_get()
+    handler_get(sess)
   elif get_method() == 'POST':
-    handler_post()
+    handler_post(sess)
