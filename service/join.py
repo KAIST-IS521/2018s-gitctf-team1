@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from common import *
 
-def handler_get():
+def handler_get(sess):
   output  = ''
   output += '<!DOCTYPE html>'
   output += '<html lang="en">'
@@ -27,9 +27,14 @@ def handler_get():
 
   headers = {}
   headers['Content-Type'] = "text/html"
+
+  tmp = sess.get_setcookie()
+  if tmp != None:
+    headers['Set-Cookie'] = tmp
+
   print_ok(headers=headers, body=output)
 
-def handler_post():
+def handler_post(sess):
   # get username from data to check exist or not
   # if not exist process or Redirect index.py
   # password rsa encryption
@@ -37,23 +42,20 @@ def handler_post():
   # redirect to login.py
 
   if False:
-    redirect_page('/index.py')
+    redirect('/index.py')
     return
 
   _POST = parse_str(raw_input())
-  redirect_page('/login.py')
+  redirect('/login.py')
 
 
 if __name__ == '__main__':
-  _COOKIE = parse_str(get_cookie())
-  try:
-    sessid = _COOKIE['TEAM1_SESSID']
-    # if already logined, GTFO
-    redirect_page('/index.py')
-  except:
-    pass
+  sess = Session()
+  if sess.get('logined') == True:
+    redirect('index.py')
+    exit()
 
   if get_method() == 'GET':
-    handler_get()
+    handler_get(sess)
   elif get_method() == 'POST':
-    handler_post()
+    handler_post(sess)

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from common import *
 
-def handler_get():
+def handler_get(sess):
   output  = ''
   output += '<!DOCTYPE html>'
   output += '<html lang="en">'
@@ -29,14 +29,21 @@ def handler_get():
   headers['Content-Type'] = "text/html"
   print_ok(headers=headers, body=output)
 
-def handler_post():
+def handler_post(sess):
   _POST = parse_str(raw_input())
-  headers = {}
-  headers['Content-Type'] = "text/html"
-  print_ok(headers=headers, body=str(_POST))
+
+  if len(_POST['username']) > 0 and _POST['password']:
+    sess.set('logined', True)
+    sess.set('username', _POST['username'])
+  redirect('/index.py')
 
 if __name__ == '__main__':
+  sess = Session()
+  if sess.get('logined') == True:
+    redirect('index.py')
+    exit()
+
   if get_method() == 'GET':
-    handler_get()
+    handler_get(sess)
   elif get_method() == 'POST':
-    handler_post()
+    handler_post(sess)
