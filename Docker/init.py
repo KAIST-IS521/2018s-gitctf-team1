@@ -27,6 +27,16 @@ def init_table():
       ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
       '''
       cursor.execute(sql)
+
+      sql = '''
+      CREATE TABLE IF NOT EXISTS `save_tbl` (
+          `idx`               int(11) NOT NULL AUTO_INCREMENT,
+          `username`          text not null,
+          `data`              blob not null,
+          PRIMARY KEY (`idx`)
+      ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+      '''
+      cursor.execute(sql)
     conn.commit()
   finally:
       conn.close()
