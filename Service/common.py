@@ -1,22 +1,24 @@
 #!/usr/bin/python
 import sys
-from datetime import datetime
-from collections import OrderedDict
-import sys
-import six
 import urllib
 import os
-from string import ascii_letters, digits
-from random import choice
-from os import path
-import pickle
+import json
 import re
 
-random_str = lambda l: ''.join([choice(ascii_letters + digits) for n in xrange(l)])
+from string import ascii_letters, digits
+from random import choice
+from datetime import datetime
+from collections import OrderedDict
+
+
+def random_str(l):
+  return ''.join(choice(ascii_letters + digits) for n in xrange(l))
+
 
 def has_variable_name(s):
   if s.find("[") > 0:
     return True
+
 
 def more_than_one_index(s, brackets=2):
   start = 0
@@ -30,6 +32,7 @@ def more_than_one_index(s, brackets=2):
   if start != -1:
     return True
   return False
+
 
 def get_key(s):
   start = s.find("[")
@@ -48,8 +51,10 @@ def is_number(s):
     return s[1:].isdigit()
   return s.isdigit()
 
+
 class MalformedQueryStringError(Exception):
   pass
+
 
 def parser_helper(key, val):
   start_bracket = key.find("[")
@@ -71,6 +76,7 @@ def parser_helper(key, val):
     val = int(val) if is_number(val) else val
     pdict[newkey] = val
   return pdict
+
 
 def parse_str(query_string, unquote=True, delimiter='&'):
   def recurse( pair, out=None, indent=0 ):
@@ -117,23 +123,29 @@ def parse_str(query_string, unquote=True, delimiter='&'):
     out = recurse(pair, out)
   return out
 
+
 def get_environ(key):
   try:
     return os.environ[key]
   except:
     return ""
 
+
 def get_method():
   return get_environ('REQUEST_METHOD')
+
 
 def get_content_length():
   return get_environ('CONTENT_LENGTH')
 
+
 def get_query_string():
   return get_environ('QUERY_STRING')
 
+
 def get_cookie():
   return get_environ('COOKIE')
+
 
 def print_ok(headers={}, body=""):
   headers['Date'] = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %Z")
@@ -146,6 +158,7 @@ def print_ok(headers={}, body=""):
   headers_str += "\r\n"
 
   sys.stdout.write(headers_str + body)
+
 
 def redirect(url):
   headers = {}
@@ -160,10 +173,11 @@ def redirect(url):
   headers_str += "\r\n"
   sys.stdout.write(headers_str)
 
+
 class Session:
   def __init__(self):
     self.keyword = 'gitctfsessid'
-    self.session_dir = path.realpath(path.dirname(path.realpath(__file__)) + '/' + 'session')
+    self.session_dir = os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + '/' + 'session')
     self.identifier = None
     self.data = {}
 
@@ -182,13 +196,13 @@ class Session:
     if self.new_flag:
       self.identifier = random_str(32)
 
-    self.path = path.realpath(self.session_dir + '/' + self.identifier)
+    self.path = os.path.realpath(self.session_dir + '/' + self.identifier)
 
-    if self.new_flag or not path.exists(self.path):
+    if self.new_flag or not os.path.exists(self.path):
       self.save_file()
 
     with open (self.path, 'rb') as fp:
-      self.data = pickle.load(fp)
+      self.data = json.load(fp)
 
   def get_setcookie(self):
     if self.new_flag:
@@ -198,7 +212,7 @@ class Session:
 
   def save_file(self):
     with open(self.path, 'wb') as fp:
-      pickle.dump(self.data, fp)
+      json.dump(self.data, fp)
 
   def get(self, key):
     if key in self.data:

@@ -37,7 +37,7 @@ def handler_post(sess):
 
 if __name__ == '__main__':
   sess = Session()
-  if sess.get('logined') == True:
+  if sess.get('logined'):
     redirect('index.py')
     exit()
 

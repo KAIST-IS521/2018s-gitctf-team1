@@ -15,7 +15,6 @@ def hexdump(src, length=16):
   return ''.join(lines)
 
 def view(sess):
-
   username = sess.get('username')
   if username == '':
     redirect('/index.py#invalid+session')

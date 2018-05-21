@@ -33,12 +33,10 @@ def handler_post(sess):
     conn.commit()
   finally:
     conn.close()
-
   redirect('/login.py')
 
 
 if __name__ == '__main__':
-
   sess = Session()
   if sess.get('logined') == True:
     redirect('index.py')
