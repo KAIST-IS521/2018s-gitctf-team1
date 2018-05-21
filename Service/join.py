@@ -10,8 +10,8 @@ def handler_post():
         redirect('/join.py')
         exit()
 
-    username = _POST['username']
-    password = enc(_POST['password'])
+    username = str(_POST['username'])
+    password = enc(str(_POST['password']))
 
     conn = pymysql.connect(host='localhost', user='root', password='root', db='RADIO',charset='utf8')
     try:
@@ -25,8 +25,10 @@ def handler_post():
             redirect('/join.py')
             exit()
 
-        sql = "INSERT INTO user_tbl (username, password) VALUES (%s, %s);"
-        cursor.execute(sql, (username, password))
+        with conn.cursor() as cursor:
+            sql = "INSERT INTO user_tbl (username, password) VALUES (%s, %s);"
+            cursor.execute(sql, (username, password))
+
         conn.commit()
     finally:
         conn.close()
