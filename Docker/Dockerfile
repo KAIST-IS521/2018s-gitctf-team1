@@ -38,9 +38,9 @@ RUN DIST=xenial && \
     apt-get install -y python-pip python-dev build-essential mysql-server make \
                        gcc g++ libcurl4-openssl-dev
 
-RUN echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
-RUN echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
-RUN apt-get install -y mysql-server
+#RUN echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
+#RUN echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
+#RUN apt-get install -y mysql-server
 WORKDIR /etc/mysql
 
 RUN pip install --upgrade pip numpy bitarray pyMySQL
@@ -60,6 +60,12 @@ ADD Service /var/www/cgi
 ADD init.sh /init.sh
 ADD init.py /init.py
 RUN chmod +x /init.sh
+ADD init_db.sh /init_db.sh
+RUN chmod +x /init_db.sh
+
+RUN /init_db.sh
+
+RUN make -C /hackttp
 
 CMD ["/init.sh"]
 # ======================================
