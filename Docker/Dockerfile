@@ -36,13 +36,12 @@ RUN DIST=xenial && \
     sed -i 's/deb.debian.org/ftp.daumkakao.com/' /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y python-pip python-dev build-essential mysql-server make \
-                       gcc g++
+                       gcc g++ libcurl4-openssl-dev
 
 RUN echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
 RUN echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
 RUN apt-get install -y mysql-server
 WORKDIR /etc/mysql
-RUN sed -i "s/127.0.0.1/0.0.0.0/g" my.cnf
 
 RUN pip install --upgrade pip numpy bitarray pyMySQL
 RUN rm -rf /var/lib/apt/lists/* && \
@@ -59,6 +58,7 @@ ADD hackttp /hackttp
 ADD Service /var/www/cgi
 
 ADD init.sh /init.sh
+ADD init.py /init.py
 RUN chmod +x /init.sh
 
 CMD ["/init.sh"]
