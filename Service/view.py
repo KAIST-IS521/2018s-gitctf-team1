@@ -6,7 +6,7 @@ import pymysql
 
 def hexdump(src, length=16):
     FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
-    ines = []
+    lines = []
     for c in xrange(0, len(src), length):
         chars = src[c:c+length]
         hex = ' '.join(["%02x" % ord(x) for x in chars])
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     if not SESS.get('logined'):
         redirect('index.py')
         exit()
-    if METHOD = 'GET':
+    if METHOD == 'GET':
         view()
     elif METHOD == 'POST':
         fetch()

@@ -10,8 +10,8 @@ def handler_post():
         redirect('/join.py')
         exit()
 
-    username = _POST['username']
-    password = enc(_POST['password'])
+    username = str(_POST['username'])
+    password = enc(str(_POST['password']))
 
     conn = pymysql.connect(host='localhost', user='root', password='root', db='RADIO',charset='utf8')
     try:
@@ -21,8 +21,8 @@ def handler_post():
 
             result = cursor.fetchone()
             if result is not None and result[1] == password:
-                sess.set('logined', True)
-                sess.set('username', result[0])
+                SESS.set('logined', True)
+                SESS.set('username', result[0])
                 redirect("/index.py")
                 exit()
         conn.commit()

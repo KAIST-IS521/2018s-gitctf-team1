@@ -42,8 +42,8 @@ def handler_post():
         redirect('/request.py#invalid+input')
         exit()
 
-    host = _POST['host']
-    port = _POST['port']
+    host = str(_POST['host'])
+    port = int(_POST['port'])
 
     username = SESS.get('username')
     if username == '':
