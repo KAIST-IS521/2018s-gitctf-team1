@@ -34,7 +34,7 @@ def handler_post():
 
 
 if __name__ == '__main__':
-    if SESS.get('logined', False):
+    if SESS.get('logined'):
         redirect('index.py')
         exit()
 
