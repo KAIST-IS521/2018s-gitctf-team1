@@ -22,6 +22,8 @@ def handler_post():
 
             result = cursor.fetchone()
         if result is not None:
+            conn.commit()
+            conn.close()
             redirect('/join.py')
             exit()
 

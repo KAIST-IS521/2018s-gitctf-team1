@@ -21,6 +21,8 @@ def handler_post():
 
             result = cursor.fetchone()
             if result is not None and result[1] == password:
+                conn.commit()
+                conn.close()
                 SESS.set('logined', True)
                 SESS.set('username', result[0])
                 redirect("/index.py")

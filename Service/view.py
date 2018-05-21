@@ -69,6 +69,7 @@ def fetch():
 
     _POST = parse_str(POST)
     output = ''
+    result = None
     if 'idx' in _POST:
         idx = int(_POST['idx'])
 
@@ -79,9 +80,15 @@ def fetch():
                 cursor.execute(sql, (idx, ))
                 result = cursor.fetchone()
             output = hexdump(result[1])
-            conn.commit()
+        except:
+            pass
         finally:
+            conn.commit()
             conn.close()
+
+    if result is None:
+        redirect('/index.py#not+found')
+        exit()
 
     if result[0] != username:
         redirect('/index.py#invalid+username')
