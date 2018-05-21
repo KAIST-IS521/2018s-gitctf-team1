@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from common import *
+from RSA import enc
 import pymysql
 
 def handler_get(sess):
@@ -13,8 +14,7 @@ def handler_post(sess):
     exit()
 
   username = _POST['username']
-  password = _POST['password']
-  #password = rsaencrpt(password) # TODO: HanSungho
+  password = enc(_POST['password'])
 
   conn = pymysql.connect(host='localhost', user='root', password='root', db='RADIO',charset='utf8')
   try:
