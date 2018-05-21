@@ -29,7 +29,7 @@ bool DataHandler::verify_path(std::string path) {
 Response *DataHandler::read_Resource(Request req, std::string path) {
 
 	if(!verify_path(path)){
-		path = "/index.html";
+		path = "/index.py";
 	}
 
     std::string tmp = req.uri;
