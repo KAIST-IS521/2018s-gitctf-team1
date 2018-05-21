@@ -6,4 +6,4 @@ e = 65537
 
 
 def enc(msg):
-    return pow(bytes_to_long(msg), e, N)
+    return hex(pow(bytes_to_long(msg), e, N))[2:-1]

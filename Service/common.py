@@ -229,7 +229,13 @@ class Session:
       del self.data[key]
       self.save_file()
 
-def main_tpl(main, sess=Session()):
+METHOD = get_environ('REQUEST_METHOD')
+POST = sys.stdin.read(int(get_environ('CONTENT_LENGTH')))
+GET = get_environ('QUERY_STRING')
+SESS = Session()
+
+def main_tpl(main):
+  sess = SESS
   logined = sess.get('logined') == True
 
   output  = ''
@@ -279,7 +285,8 @@ def main_tpl(main, sess=Session()):
 
   print_ok(headers=headers, body=output)
 
-def form_tpl(keyword, sess=Session()):
+def form_tpl(keyword):
+  sess = SESS
   output  = ''
   output += '<!DOCTYPE html>'
   output += '<html lang="en">'
@@ -311,6 +318,3 @@ def form_tpl(keyword, sess=Session()):
     headers['Set-Cookie'] = tmp
 
   print_ok(headers=headers, body=output)
-
-#def shcrypt(plain='', n=123, e=123):
-#  pass
