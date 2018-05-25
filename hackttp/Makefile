@@ -1,7 +1,7 @@
 # Tool invocations
 CC=g++
 SRC=src
-CFLAGS=-I$(SRC) -std=c++11 -O3 -Wall -fmessage-length=0
+CFLAGS=-I$(SRC) -std=c++11 -O3 -Wall -fmessage-length=0 -fPIC -pie
 
 ODIR=Release
 LIBS=
