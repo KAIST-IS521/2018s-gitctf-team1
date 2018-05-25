@@ -65,7 +65,7 @@ def handler_post():
 
     data = demodulate(np.array([unpack('<d',data[i:i+8])[0] for i in range(0,len(data),8)]))
 
-    conn = pymysql.connect(host='localhost', user='root', password='root', db='RADIO',charset='utf8')
+    conn = pymysql.connect(host='localhost', user='radio', password='star11', db='RADIO',charset='utf8')
     try:
         with conn.cursor() as cursor:
             sql = "INSERT INTO save_tbl (username, data) VALUES (%s, %s);"

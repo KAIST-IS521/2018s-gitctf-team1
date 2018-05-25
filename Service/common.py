@@ -177,7 +177,7 @@ def redirect(url):
 class Session:
   def __init__(self):
     self.keyword = 'gitctfsessid'
-    self.session_dir = os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + '/' + 'session')
+    self.session_dir = os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + '/' + 'tmp')
     self.identifier = None
     self.data = {}
 

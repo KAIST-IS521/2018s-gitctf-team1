@@ -58,9 +58,8 @@ ADD hackttp /hackttp
 ADD Service /var/www/cgi
 
 ADD init.sh /init.sh
-ADD init.py /init.py
-RUN chmod +x /init.sh
 ADD init_db.sh /init_db.sh
+RUN chmod +x /init.sh
 RUN chmod +x /init_db.sh
 
 RUN /init_db.sh

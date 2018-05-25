@@ -1,7 +1,13 @@
 #!/usr/bin/python
 from common import *
 from RSA import enc
+import string
 import pymysql
+
+
+def check_valid(x):
+    return x in string.uppercase + string.lowercase + string.digits
+
 
 def handler_post():
     _POST = parse_str(POST)
@@ -11,9 +17,13 @@ def handler_post():
         exit()
 
     username = str(_POST['username'])
+    if not all(check_valid(c) for c in username):
+        redirect('/login.py')
+        exit(0)
     password = enc(str(_POST['password']))
 
-    conn = pymysql.connect(host='localhost', user='root', password='root', db='RADIO',charset='utf8')
+    conn = pymysql.connect(host='localhost', user='radio', password='star11',
+                           db='RADIO', charset='utf8')
     try:
         with conn.cursor() as cursor:
             # check duplicate username

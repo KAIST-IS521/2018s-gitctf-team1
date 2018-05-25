@@ -13,7 +13,7 @@ def handler_post():
     username = str(_POST['username'])
     password = enc(str(_POST['password']))
 
-    conn = pymysql.connect(host='localhost', user='root', password='root', db='RADIO',charset='utf8')
+    conn = pymysql.connect(host='localhost', user='radio', password='star11', db='RADIO',charset='utf8')
     try:
         with conn.cursor() as cursor:
             sql = "SELECT username, password FROM user_tbl WHERE username=%s;"

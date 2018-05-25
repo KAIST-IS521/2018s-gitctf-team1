@@ -25,7 +25,7 @@ def view():
 
     body += '<table class="table">'
     body += '<thead><tr><th>IDX</th><th>HASH</th></tr></thead><tbody>'
-    conn = pymysql.connect(host='localhost', user='root', password='root', db='RADIO',charset='utf8')
+    conn = pymysql.connect(host='localhost', user='radio', password='star11', db='RADIO',charset='utf8')
     try:
         with conn.cursor() as cursor:
             sql = "SELECT idx, data FROM save_tbl WHERE username=%s ORDER BY idx DESC LIMIT 10;"
@@ -73,7 +73,7 @@ def fetch():
     if 'idx' in _POST:
         idx = int(_POST['idx'])
 
-        conn = pymysql.connect(host='localhost', user='root', password='root', db='RADIO',charset='utf8')
+        conn = pymysql.connect(host='localhost', user='radio', password='star11', db='RADIO',charset='utf8')
         try:
             with conn.cursor() as cursor:
                 sql = "SELECT username, data FROM save_tbl WHERE idx=%s;"
