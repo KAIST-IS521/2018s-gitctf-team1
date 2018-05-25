@@ -1,8 +1,9 @@
 #!/usr/bin/python
-from common import *
+from common import SESS, POST, METHOD
+from common import parse_str, redirect, render_form
 from RSA import enc
 import pymysql
-
+import sys
 
 def handler_post():
     _POST = parse_str(POST)
@@ -13,7 +14,8 @@ def handler_post():
     username = str(_POST['username'])
     password = enc(str(_POST['password']))
 
-    conn = pymysql.connect(host='localhost', user='radio', password='star11', db='RADIO',charset='utf8')
+    conn = pymysql.connect(host='localhost', user='radio', password='star11',
+                           db='RADIO', charset='utf8')
     try:
         with conn.cursor() as cursor:
             sql = "SELECT username, password FROM user_tbl WHERE username=%s;"
@@ -26,7 +28,7 @@ def handler_post():
                 SESS.set('logined', True)
                 SESS.set('username', result[0])
                 redirect("/index.py")
-                exit()
+                sys.exit()
         conn.commit()
     finally:
         conn.close()
@@ -39,6 +41,6 @@ if __name__ == '__main__':
         exit()
 
     if METHOD == 'GET':
-        form_tpl('Sign in')
+        render_form('Sign in')
     elif METHOD == 'POST':
         handler_post()

@@ -44,6 +44,7 @@ RUN DIST=xenial && \
 WORKDIR /etc/mysql
 
 RUN pip install --upgrade pip numpy bitarray pyMySQL
+RUN apt-get install xxd
 RUN rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -56,6 +57,8 @@ COPY flag /var/ctf/
 # Build and run your service here
 ADD hackttp /hackttp
 ADD Service /var/www/cgi
+ADD adduser.py /adduser.py
+ADD Service/RSA.py /RSA.py
 
 ADD init.sh /init.sh
 ADD init_db.sh /init_db.sh
