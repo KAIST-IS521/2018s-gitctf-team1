@@ -1,12 +1,13 @@
 #!/usr/bin/python
-from common import *
+from common import POST, METHOD, SESS
+from common import parse_str, redirect, render_form
 from RSA import enc
 import string
 import pymysql
 
 
 def check_valid(x):
-    return x in string.uppercase + string.lowercase + string.digits
+        return x in string.uppercase + string.lowercase + string.digits
 
 
 def handler_post():
@@ -53,6 +54,6 @@ if __name__ == '__main__':
         exit()
 
     if METHOD == 'GET':
-        form_tpl('Sign up')
+        render_form('Sign up')
     elif METHOD == 'POST':
         handler_post()

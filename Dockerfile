@@ -44,6 +44,7 @@ RUN DIST=xenial && \
 WORKDIR /etc/mysql
 
 RUN pip install --upgrade pip numpy bitarray pyMySQL
+RUN apt-get install xxd
 RUN rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
