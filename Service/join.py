@@ -1,5 +1,6 @@
 #!/usr/bin/python
-from common import *
+from common import POST, METHOD, SESS
+from common import parse_str, redirect, render_form
 from RSA import enc
 import string
 import pymysql
@@ -53,6 +54,6 @@ if __name__ == '__main__':
         exit()
 
     if METHOD == 'GET':
-        form_tpl('Sign up')
+        render_form('Sign up')
     elif METHOD == 'POST':
         handler_post()
